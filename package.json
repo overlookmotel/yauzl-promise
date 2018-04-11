@@ -1,0 +1,48 @@
+{
+  "name": "yauzl-promise",
+  "version": "0.0.0",
+  "description": "yauzl unzipping with Promises",
+  "main": "./lib/",
+  "author": {
+    "name": "Overlook Motel"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/overlookmotel/yauzl-promise.git"
+  },
+  "bugs": {
+    "url": "https://github.com/overlookmotel/yauzl-promise/issues"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "coveralls": "^3.0.0",
+    "cross-env": "^5.1.4",
+    "istanbul": "^0.4.5",
+    "jshint": "^2.9.5",
+    "mocha": "^5.0.5"
+  },
+  "keywords": [
+    "yauzl",
+    "unzip",
+    "zip",
+    "promise",
+    "async",
+    "await"
+  ],
+  "scripts": {
+    "test": "npm run jshint && npm run test-main",
+    "jshint": "jshint lib test",
+    "test-main": "mocha --check-leaks --colors -t 10000 -R spec \"test/**/*.test.js\"",
+    "cover": "npm run cover-main && rm -rf coverage",
+    "coveralls": "npm run cover-main && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage",
+    "cover-main": "cross-env COVERAGE=true istanbul cover _mocha --report lcovonly -- -t 10000 -R spec \"test/**/*.test.js\"",
+    "travis": "if [ $COVERAGE ]; then npm run coveralls; else npm test; fi"
+  },
+  "engines": {
+    "node": ">=6"
+  },
+  "readmeFilename": "README.md",
+  "license": "MIT"
+}

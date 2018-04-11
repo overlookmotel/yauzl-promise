@@ -1,0 +1,7 @@
+test
+coverage
+.editorconfig
+.gitignore
+.jshintrc
+.npmignore
+.travis.yml

@@ -1,0 +1,70 @@
+{
+  // enforcing options
+  "bitwise":true,
+  "camelcase":true,
+  "curly":false,
+  "eqeqeq":false,
+  "esversion":6,
+  "forin":false,
+  "freeze":true,
+  "funcscope":false,
+  "futurehostile":true,
+  "immed":true,
+  "indent":1,
+  "iterator":false,
+  "latedef":"nofunc",
+  "maxcomplexity":false,
+  "maxdepth":false,
+  "maxerr":50,
+  "maxlen":false,
+  "maxparams":false,
+  "maxstatements":false,
+  "newcap":true,
+  "noarg":true,
+  "nocomma":true,
+  "noempty":true,
+  "nonbsp":true,
+  "nonew":true,
+  "notypeof":true,
+  "quotmark":"single",
+  "shadow":false,
+  "singleGroups":true,
+  "strict":"global",
+  "undef":true,
+  "unused":"strict",
+  "varstmt":true,
+  "-W041":false, // suppress "Use '===' to compare with '0'" errors
+
+  // relaxing options
+  "asi":false,
+  "boss":false,
+  "debug":false,
+  "elision":false,
+  "eqnull":false,
+  "evil":false,
+  "expr":false,
+  "lastsemic":false,
+  "laxbreak":false,
+  "laxcomma":false,
+  "loopfunc":false,
+  "moz":false,
+  "multistr":false,
+  "notypeof":false,
+  "noyield":false,
+  "plusplus":false,
+  "proto":false,
+  "scripturl":false,
+  "sub":false,
+  "supernew":false,
+  "validthis":false,
+  "withstmt":false,
+
+  // environment options
+  "node":true,
+
+  "globals": {
+  },
+
+  "predef": [
+  ]
+}
