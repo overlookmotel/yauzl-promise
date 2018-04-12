@@ -63,6 +63,8 @@ WARNING: This is dangerous. If ZIP contains a large number of files, could lead 
 
 Read several entries and call `callback` for each.
 
+If `callback` returns a promise, the promise is awaited before reading the next entry. If `callback` throws an error or returns a rejected promise, walking stops and the promise returned by `.walkEntries()` is rejected.
+
 Returns a promise which resolves when all have been read.
 
 ```js

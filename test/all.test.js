@@ -7,7 +7,8 @@
 
 // Modules
 const chai = require('chai'),
-	expect = chai.expect,
+	{expect} = chai,
+	chaiAsPromised = require('chai-as-promised'),
 	pathJoin = require('path').join,
 	{EventEmitter} = require('events'),
 	ReadableStream = require('stream').Readable,
@@ -16,6 +17,7 @@ const chai = require('chai'),
 
 // Init
 chai.config.includeStack = true;
+chai.use(chaiAsPromised);
 
 // Tests
 
@@ -180,6 +182,40 @@ describe('Entry methods', function() {
 				const fileNames = entries.map(entry => entry.fileName);
 				expect(fileNames).to.deep.equal(FILES);
 			});
+		});
+
+		it('awaits promise returned by callback before reading next entry', function() {
+			const events = [];
+			let count = 0;
+			return this.zipFile.walkEntries(() => {
+				count++;
+				events.push(`callback${count}`);
+
+				return new Promise(resolve => {
+					setTimeout(() => {
+						events.push(`resolve${count}`);
+						resolve();
+					}, 100);
+				});
+			}).then(() => {
+				expect(events).to.deep.equal(['callback1', 'resolve1', 'callback2', 'resolve2', 'callback3', 'resolve3', 'callback4', 'resolve4']);
+			});
+		});
+
+		it('rejects promise if callback throws', function() {
+			const err = new Error('test');
+			const p = this.zipFile.walkEntries(() => {
+				throw err;
+			});
+			return expect(p).be.rejectedWith(err);
+		});
+
+		it('rejects promise if callback returns rejected promise', function() {
+			const err = new Error('test');
+			const p = this.zipFile.walkEntries(() => {
+				return new Promise((resolve, reject) => reject(err)); // jshint ignore:line
+			});
+			return expect(p).be.rejectedWith(err);
 		});
 	});
 });
