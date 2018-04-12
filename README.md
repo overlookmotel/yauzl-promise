@@ -57,11 +57,11 @@ entries.forEach( console.log );
 
 If `numEntries` is `0`, `null` or `undefined`, reading will continue until all entries are read.
 
-WARNING: This is dangerous. If ZIP contains a large number of files, could lead to crash due to out of memory.
+WARNING: This is dangerous. If ZIP contains a large number of files, could lead to crash due to out of memory. Use `.walkEntries()` instead.
 
-#### `zipFile.walkEntries( callback )`
+#### `zipFile.walkEntries( callback [, numEntries] )`
 
-Read all entries and call `callback` for each.
+Read several entries and call `callback` for each.
 
 Returns a promise which resolves when all have been read.
 
@@ -71,6 +71,8 @@ await zipFile.walkEntries( entry => {
 } );
 console.log( 'Done' );
 ```
+
+If `numEntries` is `0`, `null` or `undefined`, reading will continue until all entries are read.
 
 #### `zipFile.openReadStream( entry [, options] )`
 
