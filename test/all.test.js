@@ -24,6 +24,7 @@ chai.use(chaiAsPromised);
 /* global describe, it, beforeEach, afterEach */
 
 const PATH = pathJoin(__dirname, 'test.zip'),
+	BAD_PATH = pathJoin(__dirname, 'does-not-exist.zip'),
 	FILES = ['test_files/', 'test_files/1.txt', 'test_files/2.txt', 'test_files/3.txt'];
 
 describe('Module', function() {
@@ -71,6 +72,12 @@ describe('.open()', function() {
 			expect(zipFile.lazyEntries).to.equal(true);
 			zipFile.close();
 		});
+	});
+
+	it('returns rejected promise if IO error', function() {
+		const promise = yauzl.open(BAD_PATH);
+		expect(promise).to.be.instanceof(Promise);
+		return expect(promise).to.be.rejected;
 	});
 });
 
