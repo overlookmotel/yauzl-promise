@@ -10,7 +10,6 @@ const chai = require('chai'),
 	{expect} = chai,
 	chaiAsPromised = require('chai-as-promised'),
 	pathJoin = require('path').join,
-	{EventEmitter} = require('events'),
 	ReadableStream = require('stream').Readable,
 	yauzlOriginal = require('yauzl'),
 	yauzl = require('../lib/');
@@ -39,7 +38,6 @@ describe('Module', function() {
 		const zipFile = Object.create(ZipFile.prototype);
 		expect(zipFile).to.be.instanceof(ZipFile);
 		expect(zipFile).not.to.be.instanceof(yauzlOriginal.ZipFile);
-		expect(zipFile).to.be.instanceof(EventEmitter);
 	});
 
 	it('clones yauzl.Entry', function() {
