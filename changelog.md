@@ -12,3 +12,7 @@
 * `ZipFile` is not event emitter (closes #3)
 * Test for `.open` returning rejected promise if IO error
 * Update `mocha` dev dependency
+
+## Next
+
+* Do not copy event emitter properties to `ZipFile` instances
