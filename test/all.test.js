@@ -56,21 +56,28 @@ describe('.open()', function() {
 		const promise = yauzl.open(PATH);
 		expect(promise).to.be.instanceof(Promise);
 		return promise.then(zipFile => {
-			zipFile.close();
+			return zipFile.close();
 		});
 	});
 
 	it('resolves to instance of yauzl.ZipFile', function() {
 		return yauzl.open(PATH).then(zipFile => {
 			expect(zipFile).to.be.instanceof(yauzl.ZipFile);
-			zipFile.close();
+			return zipFile.close();
 		});
 	});
 
 	it('ignores `lazyEntries` option', function() {
 		return yauzl.open(PATH, {lazyEntries: false}).then(zipFile => {
 			expect(zipFile.lazyEntries).to.equal(true);
-			zipFile.close();
+			return zipFile.close();
+		});
+	});
+
+	it('ignores `autoClose` option', function() {
+		return yauzl.open(PATH, {autoClose: true}).then(zipFile => {
+			expect(zipFile.autoClose).to.equal(false);
+			return zipFile.close();
 		});
 	});
 
@@ -78,6 +85,16 @@ describe('.open()', function() {
 		const promise = yauzl.open(BAD_PATH);
 		expect(promise).to.be.instanceof(Promise);
 		return expect(promise).to.be.rejected;
+	});
+});
+
+describe('.close()', function() {
+	it('returns a Promise', function() {
+		return yauzl.open(PATH).then(zipFile => {
+			const promise = zipFile.close();
+			expect(promise).to.be.instanceof(Promise);
+			return promise;
+		});
 	});
 });
 
@@ -89,7 +106,7 @@ describe('Entry methods', function() {
 	});
 
 	afterEach(function() {
-		this.zipFile.close();
+		return this.zipFile.close();
 	});
 
 	describe('.readEntry()', function() {
@@ -229,21 +246,26 @@ describe('Stream methods', function() {
 	beforeEach(function() {
 		return yauzl.open(PATH).then(zipFile => {
 			this.zipFile = zipFile;
+			return zipFile.readEntry();
+		}).then(entry => {
+			this.entry = entry;
 		});
 	});
 
 	afterEach(function() {
-		this.zipFile.close();
+		return this.zipFile.close();
 	});
 
 	describe('zipFile.openReadStream()', function() {
 		beforeEach(function() {
-			this.promise = this.zipFile.readEntry().then(entry => {
-				return this.zipFile.openReadStream(entry);
-			});
+			this.promise = this.zipFile.openReadStream(this.entry);
 			return this.promise.then(stream => {
 				this.stream = stream;
 			});
+		});
+
+		afterEach(function() {
+			this.stream.on('error', () => {}).destroy();
 		});
 
 		it('returns a Promise', function() {
@@ -257,12 +279,14 @@ describe('Stream methods', function() {
 
 	describe('entry.openReadStream()', function() {
 		beforeEach(function() {
-			this.promise = this.zipFile.readEntry().then(entry => {
-				return entry.openReadStream();
-			});
+			this.promise = this.entry.openReadStream();
 			return this.promise.then(stream => {
 				this.stream = stream;
 			});
+		});
+
+		afterEach(function() {
+			this.stream.on('error', () => {}).destroy();
 		});
 
 		it('returns a Promise', function() {

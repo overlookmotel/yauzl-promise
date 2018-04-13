@@ -33,7 +33,20 @@ const yauzl = require( 'yauzl-promise' );
 const zipFile = await yauzl.open( '/path/to/file' );
 ```
 
-NB The `lazyEntries` option is automatically enabled. Get file entries using methods listed below.
+`lazyEntries` option is automatically enabled. Get file entries using methods listed below.
+
+`autoClose` option is automatically disabled. `ZipFile`s must be closed manually with `.close()`.
+
+#### `zipFile.close()`
+
+Closes file and returns Promise which resolves when reading is complete and all streams are closed.
+
+Files **must** be closed when finished with to avoid resource leakages.
+
+```js
+const zipFile = await yauzl.open( '/path/to/file' );
+await zipFile.close();
+```
 
 #### `zipFile.readEntry()`
 
