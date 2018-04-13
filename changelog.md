@@ -11,3 +11,4 @@
 * `.walkEntries` awaits promise from callback (closes #1)
 * `ZipFile` is not event emitter (closes #3)
 * Test for `.open` returning rejected promise if IO error
+* Update `mocha` dev dependency
