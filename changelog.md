@@ -4,7 +4,7 @@
 
 * Initial release
 
-## Next
+## 1.1.0
 
 * Promisify `.close` method
 * `.readEntries` + `.walkEntries` avoid creating long promise chains (closes #2)
