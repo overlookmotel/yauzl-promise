@@ -13,7 +13,7 @@
 * Test for `.open` returning rejected promise if IO error
 * Update `mocha` dev dependency
 
-## Next
+## 1.1.1
 
 * Fix: No crash on unexpected errors/events from reader
 * Fix: Do not clone ZipFile or Entry if not required
