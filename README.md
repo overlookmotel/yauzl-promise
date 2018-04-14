@@ -39,7 +39,7 @@ const zipFile = await yauzl.open( '/path/to/file' );
 
 #### `zipFile.close()`
 
-Closes file and returns Promise which resolves when reading is complete and all streams are closed.
+Closes file and returns Promise which resolves when all streams are closed.
 
 Files **must** be closed when finished with to avoid resource leakages.
 

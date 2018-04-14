@@ -15,4 +15,5 @@
 
 ## Next
 
+* Fix: Do not clone ZipFile or Entry if not required
 * Do not copy event emitter properties to `ZipFile` instances
