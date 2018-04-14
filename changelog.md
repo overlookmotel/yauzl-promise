@@ -17,4 +17,5 @@
 
 * Fix: No crash on unexpected errors/events from reader
 * Fix: Do not clone ZipFile or Entry if not required
+* Fix: Typos in error messages
 * Do not copy event emitter properties to `ZipFile` instances
