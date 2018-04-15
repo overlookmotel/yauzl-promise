@@ -11,6 +11,7 @@ const chai = require('chai'),
 	chaiAsPromised = require('chai-as-promised'),
 	pathJoin = require('path').join,
 	ReadableStream = require('stream').Readable,
+	Bluebird = require('bluebird'),
 	yauzlOriginal = require('yauzl'),
 	yauzl = require('../lib/');
 
@@ -21,7 +22,7 @@ chai.use(chaiAsPromised);
 // Tests
 
 /* jshint expr: true */
-/* global describe, it, beforeEach, afterEach */
+/* global describe, it, beforeEach, afterEach, before */
 
 const PATH = pathJoin(__dirname, 'test.zip'),
 	BAD_PATH = pathJoin(__dirname, 'does-not-exist.zip'),
@@ -50,6 +51,41 @@ describe('Module', function() {
 		expect(entry).not.to.be.instanceof(yauzlOriginal.Entry);
 	});
 });
+
+describe('With default yauzl object', function() {
+	before(function() {
+		this.Promise = Promise;
+		this.yauzl = yauzl;
+	});
+	runTests();
+});
+
+describe('With specified Promise', function() {
+	before(function() {
+		this.Promise = Bluebird;
+		this.yauzl = yauzl.usePromise(Bluebird);
+	});
+	runTests();
+});
+
+describe('With specified yauzl object', function() {
+	before(function() {
+		this.Promise = Promise;
+		this.yauzl = yauzl.useYauzl(yauzlOriginal);
+	});
+
+	runTests();
+});
+
+function runTests() {
+	// Inject `yauzl` and `Promise` into local scope at tests run time.
+	// Doing at tests define time alters `yauzlOriginal` object
+	// before tests on default behavior run.
+	let yauzl, Promise;
+	before(function() {
+		yauzl = this.yauzl;
+		Promise = this.Promise;
+	});
 
 describe('.open()', function() {
 	it('returns a Promise', function() {
@@ -298,3 +334,5 @@ describe('Stream methods', function() {
 		});
 	});
 });
+
+}

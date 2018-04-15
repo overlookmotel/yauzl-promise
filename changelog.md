@@ -20,3 +20,7 @@
 * Fix: Typos in error messages
 * Do not copy event emitter properties to `ZipFile` instances
 * Refactor: Only use jshint `validthis` in functions that need it
+
+## Next
+
+* Tests for `.usePromise` + `.useYauzl`
