@@ -23,4 +23,5 @@
 
 ## Next
 
+* `ZipFile` + `Entry` subclass originals
 * Tests for `.usePromise` + `.useYauzl`

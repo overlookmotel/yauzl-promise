@@ -108,6 +108,14 @@ const readStream = await entry.openReadStream();
 readStream.pipe( writeStream );
 ```
 
+### Events
+
+`ZipFile` objects are from a subclass of yauzl's original `ZipFile` class. They are event emitters but do not emit any of the events original yauzl module emits (`entry`, `end`, `close` or `error`).
+
+These events are replaced by the resolution/rejection of promises returned by the methods listed above.
+
+If an `error` event is emitted unexpectedly within yauzl at a time when no operation (`readEntry()` etc) is in progress, that event is consumed to prevent the process from crashing. The next time `readEntry()`, `close()` or `openReadStream()` is called, the promise returned from that method will reject with the previously emitted error.
+
 ### Customization
 
 #### Alternative Promise implementation

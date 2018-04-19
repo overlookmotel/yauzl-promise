@@ -11,6 +11,7 @@ const chai = require('chai'),
 	chaiAsPromised = require('chai-as-promised'),
 	pathJoin = require('path').join,
 	ReadableStream = require('stream').Readable,
+	EventEmitter = require('events'),
 	Bluebird = require('bluebird'),
 	yauzlOriginal = require('yauzl'),
 	yauzl = require('../lib/');
@@ -39,7 +40,8 @@ describe('Module', function() {
 
 		const zipFile = Object.create(ZipFile.prototype);
 		expect(zipFile).to.be.instanceof(ZipFile);
-		expect(zipFile).not.to.be.instanceof(yauzlOriginal.ZipFile);
+		expect(zipFile).to.be.instanceof(yauzlOriginal.ZipFile);
+		expect(zipFile).to.be.instanceof(EventEmitter);
 	});
 
 	it('clones yauzl.Entry', function() {
@@ -48,7 +50,7 @@ describe('Module', function() {
 
 		const entry = Object.create(Entry.prototype);
 		expect(entry).to.be.instanceof(Entry);
-		expect(entry).not.to.be.instanceof(yauzlOriginal.Entry);
+		expect(entry).to.be.instanceof(yauzlOriginal.Entry);
 	});
 });
 
