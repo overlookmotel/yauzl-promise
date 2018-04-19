@@ -24,4 +24,5 @@
 ## Next
 
 * `ZipFile` + `Entry` subclass originals
+* Use events-intercept module for capturing events
 * Tests for `.usePromise` + `.useYauzl`
