@@ -25,5 +25,6 @@
 
 * `ZipFile` + `Entry` subclass originals
 * Use events-intercept module for capturing events
+* Store state in symbol attributes
 * Refactor: `opened` function
 * Tests for `.usePromise` + `.useYauzl`
