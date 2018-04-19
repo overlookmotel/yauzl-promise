@@ -157,6 +157,13 @@ const yauzlFork = require( 'my-yauzl-fork' );
 const yauzl = require( 'yauzl-promise' ).useYauzl( yauzlFork );
 ```
 
+The yauzl object passed is cloned before it is modified, unless you set `clone` option to `false`:
+
+```js
+const yauzl = require( 'yauzl-promise' ).useYauzl( yauzlFork, { clone: false } );
+console.log( yauzl == yauzlFork ); // true
+```
+
 ## Tests
 
 Use `npm test` to run the tests. Use `npm run cover` to check coverage.

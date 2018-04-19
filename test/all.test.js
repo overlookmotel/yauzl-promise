@@ -29,74 +29,87 @@ const PATH = pathJoin(__dirname, 'test.zip'),
 	BAD_PATH = pathJoin(__dirname, 'does-not-exist.zip'),
 	FILES = ['test_files/', 'test_files/1.txt', 'test_files/2.txt', 'test_files/3.txt'];
 
-describe('Module', function() {
-	it('clones yauzl object', function() {
-		expect(yauzl).to.not.equal(yauzlOriginal);
-	});
-
-	it('clones yauzl.ZipFile', function() {
-		const {ZipFile} = yauzl;
-		expect(ZipFile).to.not.equal(yauzlOriginal.ZipFile);
-
-		const zipFile = Object.create(ZipFile.prototype);
-		expect(zipFile).to.be.instanceof(ZipFile);
-		expect(zipFile).to.be.instanceof(yauzlOriginal.ZipFile);
-		expect(zipFile).to.be.instanceof(EventEmitter);
-	});
-
-	it('clones yauzl.Entry', function() {
-		const {Entry} = yauzl;
-		expect(Entry).to.not.equal(yauzlOriginal.Entry);
-
-		const entry = Object.create(Entry.prototype);
-		expect(entry).to.be.instanceof(Entry);
-		expect(entry).to.be.instanceof(yauzlOriginal.Entry);
-	});
-});
-
-describe('With default yauzl object', function() {
+describe('Default module', function() {
 	before(function() {
 		this.Promise = Promise;
 		this.yauzl = yauzl;
 	});
-	runTests();
+	runTests(true);
 });
 
-describe('With specified Promise', function() {
+describe('.usePromise()', function() {
 	before(function() {
 		this.Promise = Bluebird;
 		this.yauzl = yauzl.usePromise(Bluebird);
 	});
-	runTests();
+	runTests(true);
 });
 
-describe('With specified yauzl object', function() {
+describe('.useYauzl()', function() {
 	before(function() {
 		this.Promise = Promise;
 		this.yauzl = yauzl.useYauzl(yauzlOriginal);
 	});
-
-	runTests();
+	runTests(true);
 });
 
-describe('With specified Promise and yauzl object', function() {
+describe('.use()', function() {
 	before(function() {
 		this.Promise = Bluebird;
 		this.yauzl = yauzl.use(Bluebird, yauzlOriginal);
 	});
-
-	runTests();
+	runTests(true);
 });
 
-function runTests() {
+describe('.useYauzl() with options.clone = false', function() {
+	before(function() {
+		this.Promise = Promise;
+		this.yauzl = yauzl.useYauzl(yauzlOriginal, {clone: false});
+	});
+
+	it('does not clone yauzl', function() {
+		expect(this.yauzl).to.equal(yauzlOriginal);
+	});
+
+	runTests(false);
+});
+
+function runTests(cloned) {
 	// Inject `yauzl` and `Promise` into local scope at tests run time.
-	// Doing at tests define time alters `yauzlOriginal` object
-	// before tests on default behavior run.
+	// Doing at tests define time alters `yauzlOriginal` object in
+	// `clone: false` run before tests on default behavior run.
 	let yauzl, Promise;
 	before(function() {
 		yauzl = this.yauzl;
 		Promise = this.Promise;
 	});
+
+	if (cloned) {
+		describe('clones', function() {
+			it('yauzl object', function() {
+				expect(yauzl).to.not.equal(yauzlOriginal);
+			});
+
+			it('yauzl.ZipFile', function() {
+				const {ZipFile} = yauzl;
+				expect(ZipFile).to.not.equal(yauzlOriginal.ZipFile);
+
+				const zipFile = Object.create(ZipFile.prototype);
+				expect(zipFile).to.be.instanceof(ZipFile);
+				expect(zipFile).to.be.instanceof(yauzlOriginal.ZipFile);
+				expect(zipFile).to.be.instanceof(EventEmitter);
+			});
+
+			it('yauzl.Entry', function() {
+				const {Entry} = yauzl;
+				expect(Entry).to.not.equal(yauzlOriginal.Entry);
+
+				const entry = Object.create(Entry.prototype);
+				expect(entry).to.be.instanceof(Entry);
+				expect(entry).to.be.instanceof(yauzlOriginal.Entry);
+			});
+		});
+	}
 
 describe('.open()', function() {
 	it('returns a Promise', function() {
