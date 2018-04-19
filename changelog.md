@@ -21,7 +21,7 @@
 * Do not copy event emitter properties to `ZipFile` instances
 * Refactor: Only use jshint `validthis` in functions that need it
 
-## Next
+## 2.0.0
 
 * `useYauzl` clones yauzl object provided
 * `useYauzl` clone option
