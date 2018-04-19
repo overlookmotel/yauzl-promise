@@ -23,6 +23,7 @@
 
 ## Next
 
+* `useYauzl` clones yauzl object provided
 * `ZipFile` + `Entry` subclass originals
 * Use events-intercept module for capturing events
 * Store state in symbol attributes

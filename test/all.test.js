@@ -79,6 +79,15 @@ describe('With specified yauzl object', function() {
 	runTests();
 });
 
+describe('With specified Promise and yauzl object', function() {
+	before(function() {
+		this.Promise = Bluebird;
+		this.yauzl = yauzl.use(Bluebird, yauzlOriginal);
+	});
+
+	runTests();
+});
+
 function runTests() {
 	// Inject `yauzl` and `Promise` into local scope at tests run time.
 	// Doing at tests define time alters `yauzlOriginal` object
