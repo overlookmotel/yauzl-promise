@@ -30,3 +30,7 @@
 * Store state in symbol attributes
 * Refactor: `opened` function
 * Tests for `.usePromise` + `.useYauzl`
+
+## Next
+
+* `.close` method works for zip files from `.fromBuffer`
