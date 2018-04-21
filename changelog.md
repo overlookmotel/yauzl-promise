@@ -35,3 +35,4 @@
 
 * `.close` method works for zip files from `.fromBuffer`
 * Tests for all access methods
+* Lint: Tests indentation
