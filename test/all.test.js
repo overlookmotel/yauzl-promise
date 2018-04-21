@@ -10,6 +10,8 @@ const chai = require('chai'),
 	{expect} = chai,
 	chaiAsPromised = require('chai-as-promised'),
 	pathJoin = require('path').join,
+	fs = require('fs'),
+	fdSlicer = require('fd-slicer'),
 	ReadableStream = require('stream').Readable,
 	EventEmitter = require('events'),
 	Bluebird = require('bluebird'),
@@ -29,6 +31,7 @@ const PATH = pathJoin(__dirname, 'test.zip'),
 	BAD_PATH = pathJoin(__dirname, 'does-not-exist.zip'),
 	FILES = ['test_files/', 'test_files/1.txt', 'test_files/2.txt', 'test_files/3.txt'];
 
+// Run tests for yauzl object created with all methods
 describe('Default module', function() {
 	before(function() {
 		this.Promise = Promise;
@@ -67,10 +70,6 @@ describe('.useYauzl() with options.clone = false', function() {
 		this.yauzl = yauzl.useYauzl(yauzlOriginal, {clone: false});
 	});
 
-	it('does not clone yauzl', function() {
-		expect(this.yauzl).to.equal(yauzlOriginal);
-	});
-
 	runTests(false);
 });
 
@@ -84,6 +83,7 @@ function runTests(cloned) {
 		Promise = this.Promise;
 	});
 
+	// Test for cloning
 	if (cloned) {
 		describe('clones', function() {
 			it('yauzl object', function() {
@@ -109,48 +109,97 @@ function runTests(cloned) {
 				expect(entry).to.be.instanceof(yauzlOriginal.Entry);
 			});
 		});
+	} else {
+		it('does not clone yauzl', function() {
+			expect(yauzl).to.equal(yauzlOriginal);
+		});
 	}
 
-describe('.open()', function() {
-	it('returns a Promise', function() {
-		const promise = yauzl.open(PATH);
-		expect(promise).to.be.instanceof(Promise);
-		return promise.then(zipFile => {
-			return zipFile.close();
+	// Run tests on each access method
+	describe('Zip file accessed with .open()', function() {
+		describe(`.open()`, function() {
+			it('returns rejected promise if IO error', function() {
+				const promise = yauzl.open(BAD_PATH);
+				expect(promise).to.be.instanceof(Promise);
+				return expect(promise).to.be.rejected;
+			});
+		});
+
+		runMainTests('open', options => {
+			return yauzl.open(PATH, options);
 		});
 	});
 
-	it('resolves to instance of yauzl.ZipFile', function() {
-		return yauzl.open(PATH).then(zipFile => {
-			expect(zipFile).to.be.instanceof(yauzl.ZipFile);
-			return zipFile.close();
+	describe('Zip file accessed with .fromFd()', function() {
+		runMainTests('fromFd', options => {
+			const fd = fs.openSync(PATH, 'r');
+			return yauzl.fromFd(fd, options);
 		});
 	});
 
-	it('ignores `lazyEntries` option', function() {
-		return yauzl.open(PATH, {lazyEntries: false}).then(zipFile => {
-			expect(zipFile.lazyEntries).to.equal(true);
-			return zipFile.close();
+	describe('Zip file accessed with .fromBuffer()', function() {
+		runMainTests('fromBuffer', options => {
+			const buffer = fs.readFileSync(PATH);
+			return yauzl.fromBuffer(buffer, options);
 		});
 	});
 
-	it('ignores `autoClose` option', function() {
-		return yauzl.open(PATH, {autoClose: true}).then(zipFile => {
-			expect(zipFile.autoClose).to.equal(false);
-			return zipFile.close();
+	describe('Zip file accessed with .fromRandomAccessReader()', function() {
+		runMainTests('fromRandomAccessReader', options => {
+			const buffer = fs.readFileSync(PATH);
+			const reader = fdSlicer.createFromBuffer(buffer);
+			reader.unref = yauzl.RandomAccessReader.prototype.unref;
+			reader.close = cb => cb();
+
+			return yauzl.fromRandomAccessReader(reader, buffer.length, options);
 		});
 	});
+}
 
-	it('returns rejected promise if IO error', function() {
-		const promise = yauzl.open(BAD_PATH);
-		expect(promise).to.be.instanceof(Promise);
-		return expect(promise).to.be.rejected;
+function runMainTests(methodName, method) {
+	// Inject `yauzl` and `Promise` into local scope at tests run time.
+	// Doing at tests define time alters `yauzlOriginal` object in
+	// `clone: false` run before tests on default behavior run.
+	let yauzl, Promise;
+	before(function() {
+		yauzl = this.yauzl;
+		Promise = this.Promise;
 	});
-});
+
+	describe(`.${methodName}()`, function() {
+		it('returns a Promise', function() {
+			const promise = method();
+			expect(promise).to.be.instanceof(Promise);
+			return promise.then(zipFile => {
+				return zipFile.close();
+			});
+		});
+
+		it('resolves to instance of yauzl.ZipFile', function() {
+			return method().then(zipFile => {
+				expect(zipFile).to.be.instanceof(yauzl.ZipFile);
+				return zipFile.close();
+			});
+		});
+
+		it('ignores `lazyEntries` option', function() {
+			return method({lazyEntries: false}).then(zipFile => {
+				expect(zipFile.lazyEntries).to.equal(true);
+				return zipFile.close();
+			});
+		});
+
+		it('ignores `autoClose` option', function() {
+			return method({autoClose: true}).then(zipFile => {
+				expect(zipFile.autoClose).to.equal(false);
+				return zipFile.close();
+			});
+		});
+	});
 
 describe('.close()', function() {
 	it('returns a Promise', function() {
-		return yauzl.open(PATH).then(zipFile => {
+		return method().then(zipFile => {
 			const promise = zipFile.close();
 			expect(promise).to.be.instanceof(Promise);
 			return promise;
@@ -160,7 +209,7 @@ describe('.close()', function() {
 
 describe('Entry methods', function() {
 	beforeEach(function() {
-		return yauzl.open(PATH).then(zipFile => {
+		return method().then(zipFile => {
 			this.zipFile = zipFile;
 		});
 	});
@@ -304,7 +353,7 @@ describe('Entry methods', function() {
 
 describe('Stream methods', function() {
 	beforeEach(function() {
-		return yauzl.open(PATH).then(zipFile => {
+		return method().then(zipFile => {
 			this.zipFile = zipFile;
 			return zipFile.readEntry();
 		}).then(entry => {
