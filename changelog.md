@@ -31,7 +31,7 @@
 * Refactor: `opened` function
 * Tests for `.usePromise` + `.useYauzl`
 
-## Next
+## 2.0.1
 
 * `.close` method works for zip files from `.fromBuffer`
 * Tests for all access methods
