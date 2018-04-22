@@ -14,8 +14,8 @@
     "url": "https://github.com/overlookmotel/yauzl-promise/issues"
   },
   "dependencies": {
-    "events-intercept": "^2.0.0",
-    "yauzl": "^2.9.1"
+    "yauzl": "^2.9.1",
+    "yauzl-clone": "^1.0.0"
   },
   "devDependencies": {
     "bluebird": "^3.5.1",

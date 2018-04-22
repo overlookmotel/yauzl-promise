@@ -39,4 +39,5 @@
 
 ## Next
 
+* Use `yauzl-clone` module for cloning yauzl object
 * Fix: Add `fd-slicer` dev dependency
