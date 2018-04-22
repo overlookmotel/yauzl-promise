@@ -37,7 +37,7 @@
 * Tests for all access methods
 * Lint: Tests indentation
 
-## Next
+## 2.1.0
 
 * Use `yauzl-clone` module for cloning yauzl object
 * Fix: Add `fd-slicer` dev dependency
