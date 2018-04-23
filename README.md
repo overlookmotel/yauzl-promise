@@ -153,13 +153,14 @@ console.log( p instanceof Bluebird ); // true
 Only useful if you have a modified version of yauzl which you want to promisify.
 
 ```js
-const yauzlFork = require( 'my-yauzl-fork' );
-const yauzl = require( 'yauzl-promise' ).useYauzl( yauzlFork );
+const yauzlCrc = require( 'yauzl-crc' );
+const yauzl = require( 'yauzl-promise' ).useYauzl( yauzlCrc );
 ```
 
 The yauzl object passed is cloned before it is modified, unless you set `clone` option to `false`:
 
 ```js
+const yauzlFork = require('my-yauzl-fork');
 const yauzl = require( 'yauzl-promise' ).useYauzl( yauzlFork, { clone: false } );
 console.log( yauzl == yauzlFork ); // true
 ```
