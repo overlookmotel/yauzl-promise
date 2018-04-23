@@ -42,7 +42,7 @@
 * Use `yauzl-clone` module for cloning yauzl object
 * Fix: Add `fd-slicer` dev dependency
 
-## Next
+## 2.1.1
 
 * Update `yauzl-clone` dependency
 * README update
