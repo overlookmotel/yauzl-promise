@@ -1,6 +1,6 @@
 {
   "name": "yauzl-promise",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "yauzl unzipping with Promises",
   "main": "./lib/",
   "author": {
