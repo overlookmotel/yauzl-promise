@@ -46,3 +46,7 @@
 
 * Update `yauzl-clone` dependency
 * README update
+
+# Next
+
+* Update `yauzl-clone` dependency
