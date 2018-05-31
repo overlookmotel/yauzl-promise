@@ -3,6 +3,7 @@
   "version": "2.1.2",
   "description": "yauzl unzipping with Promises",
   "main": "./lib/",
+  "types": "./types/index.d.ts",
   "author": {
     "name": "Overlook Motel"
   },
@@ -18,6 +19,7 @@
     "yauzl-clone": "^1.0.2"
   },
   "devDependencies": {
+    "@types/yauzl": "^2.9.0",
     "bluebird": "^3.5.1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
