@@ -56,3 +56,4 @@
 * Update `yauzl-clone` dependency
 * Fix changelog typo
 * Run Travis CI tests on Node v10
+* Update dev dependencies

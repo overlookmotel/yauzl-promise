@@ -21,12 +21,12 @@
     "bluebird": "^3.5.1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.0.0",
-    "cross-env": "^5.1.4",
+    "coveralls": "^3.0.1",
+    "cross-env": "^5.1.6",
     "fd-slicer": "^1.0.1",
     "istanbul": "^0.4.5",
     "jshint": "^2.9.5",
-    "mocha": "^5.1.0"
+    "mocha": "^5.2.0"
   },
   "keywords": [
     "yauzl",
