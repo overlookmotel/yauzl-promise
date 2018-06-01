@@ -51,7 +51,7 @@
 
 * Update `yauzl-clone` dependency
 
-## Next
+## 2.1.3
 
 * Update `yauzl-clone` dependency
 * Fix changelog typo
