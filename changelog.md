@@ -53,4 +53,5 @@
 
 ## Next
 
+* Update `yauzl-clone` dependency
 * Fix changelog typo
