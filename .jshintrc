@@ -4,7 +4,7 @@
   "camelcase":true,
   "curly":false,
   "eqeqeq":false,
-  "esversion":6,
+  "esversion":9,
   "forin":false,
   "freeze":true,
   "funcscope":false,

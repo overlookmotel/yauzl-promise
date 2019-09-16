@@ -261,6 +261,17 @@ function runMainTests(methodName, method) {
 			});
 		});
 
+		describe('async iterator', function() {
+			it('iterates entries', async function() {
+				let fileNames = [];
+				for await (let entry of this.zipFile) {
+					fileNames.push(entry.fileName);
+				}
+
+				expect(fileNames).to.deep.equal(FILES);
+			});
+		});
+
 		describe('.readEntries()', function() {
 			it('returns a Promise', function() {
 				const promise = this.zipFile.readEntries();
