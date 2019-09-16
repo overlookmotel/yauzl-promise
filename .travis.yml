@@ -4,6 +4,7 @@ script:
   - "npm run travis"
 
 node_js:
+  - "8"
   - "10"
   - "12"
 

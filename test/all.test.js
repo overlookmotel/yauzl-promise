@@ -263,9 +263,15 @@ function runMainTests(methodName, method) {
 
 		describe('async iterator', function() {
 			it('iterates entries', async function() {
+				if (typeof Symbol.asyncIterator == 'undefined') {
+					// Node 8 compatibility
+					return;
+				}
+
 				let fileNames = [];
-				for await (let entry of this.zipFile) {
-					fileNames.push(entry.fileName);
+				let iter = this.zipFile[Symbol.asyncIterator]();
+				for (let next = await iter.next(); !next.done; next = await iter.next()) {
+					fileNames.push(next.value.fileName);
 				}
 
 				expect(fileNames).to.deep.equal(FILES);
