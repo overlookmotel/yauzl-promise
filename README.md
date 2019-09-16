@@ -15,6 +15,32 @@
 
 Promisified version of [yauzl](https://www.npmjs.com/package/yauzl) for unzipping ZIP files.
 
+```javascript
+const yauzl = require('yauzl-promise');
+
+async function node8() {
+  let zipfile = await yauzl.open('path/to/file.zip');
+  for (let entry = await zipfile.readEntry(); entry; entry = await zipfile.readEntry()) {
+    if (!entry.fileName.endsWith('/')) {
+      let readStream = await entry.openReadStream();
+      readStream.pipe(somewhere);
+    }
+  }
+  await zipfile.close();
+}
+
+async function node10() {
+  let zipfile = await yauzl.open('path/to/file.zip');
+  for await (let entry of zipfile) {
+    if (!entry.fileName.endsWith('/')) {
+      let readStream = await entry.openReadStream();
+      readStream.pipe(somewhere);
+    }
+  }
+  await zipfile.close();
+}
+```
+
 ### Installation
 
 ```
