@@ -19,8 +19,8 @@ const pathJoin = require('path').join,
 
 // Tests
 
-const PATH = pathJoin(__dirname, 'test.zip'),
-	BAD_PATH = pathJoin(__dirname, 'does-not-exist.zip'),
+const PATH = pathJoin(__dirname, 'fixtures/test.zip'),
+	BAD_PATH = pathJoin(__dirname, 'fixtures/does-not-exist.zip'),
 	FILES = ['test_files/', 'test_files/1.txt', 'test_files/2.txt', 'test_files/3.txt'];
 
 // Run tests for yauzl object created with all methods
