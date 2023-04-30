@@ -340,11 +340,12 @@ function runMainTests(methodName, method, getYauzl, Promise) {
 				promise = zipFile.openReadStream(entry);
 				return promise.then((thisStream) => {
 					stream = thisStream;
+					stream.on('error', () => {});
 				});
 			});
 
 			afterEach(() => {
-				stream.on('error', () => {}).destroy();
+				stream.destroy();
 			});
 
 			it('returns a Promise', () => {
@@ -362,11 +363,12 @@ function runMainTests(methodName, method, getYauzl, Promise) {
 				promise = entry.openReadStream();
 				return promise.then((thisStream) => {
 					stream = thisStream;
+					stream.on('error', () => {});
 				});
 			});
 
 			afterEach(() => {
-				stream.on('error', () => {}).destroy();
+				stream.destroy();
 			});
 
 			it('returns a Promise', () => {
