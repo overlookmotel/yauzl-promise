@@ -16,17 +16,25 @@ npm install yauzl-promise
 
 ### Simple usage
 
+Unzip all files from ZIP to a directory:
+
 ```js
-const {pipeline} = require('stream/promises');
+const fs = require('fs'),
+  {pipeline} = require('stream/promises');
+
 const zipFile = await yauzl.open('/path/to/file.zip');
 try {
   for await (const entry of zipFile) {
-    if (entry.fileName.endsWith('/')) continue;
-    const readStream = await entry.openReadStream();
-    await pipeline(readStream, writeStream);
+    if (entry.fileName.endsWith('/')) {
+      await fs.promises.mkdir(`/path/to/output/${entry.fileName}`);
+    } else {
+      const readStream = await entry.openReadStream();
+      const writeStream = fs.createWriteStream(`/path/to/output/${entry.fileName}`);
+      await pipeline(readStream, writeStream);
+    }
   }
 } finally {
-  await zipfile.close();
+  await zipFile.close();
 }
 ```
 
