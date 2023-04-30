@@ -3,6 +3,8 @@
  * Tests
  * ------------------*/
 
+/* eslint-disable no-invalid-this */
+
 'use strict';
 
 // Modules
@@ -24,7 +26,6 @@ chai.use(chaiAsPromised);
 
 // Tests
 
-/* jshint expr: true */
 /* global describe, it, beforeEach, afterEach, before */
 
 const PATH = pathJoin(__dirname, 'test.zip'),
@@ -32,7 +33,7 @@ const PATH = pathJoin(__dirname, 'test.zip'),
 	FILES = ['test_files/', 'test_files/1.txt', 'test_files/2.txt', 'test_files/3.txt'];
 
 // Run tests for yauzl object created with all methods
-describe('Default module', function() {
+describe('Default module', () => {
 	before(function() {
 		this.Promise = Promise;
 		this.yauzl = yauzl;
@@ -40,7 +41,7 @@ describe('Default module', function() {
 	runTests(true);
 });
 
-describe('.usePromise()', function() {
+describe('.usePromise()', () => {
 	before(function() {
 		this.Promise = Bluebird;
 		this.yauzl = yauzl.usePromise(Bluebird);
@@ -48,7 +49,7 @@ describe('.usePromise()', function() {
 	runTests(true);
 });
 
-describe('.useYauzl()', function() {
+describe('.useYauzl()', () => {
 	before(function() {
 		this.Promise = Promise;
 		this.yauzl = yauzl.useYauzl(yauzlOriginal);
@@ -56,7 +57,7 @@ describe('.useYauzl()', function() {
 	runTests(true);
 });
 
-describe('.use()', function() {
+describe('.use()', () => {
 	before(function() {
 		this.Promise = Bluebird;
 		this.yauzl = yauzl.use(Bluebird, yauzlOriginal);
@@ -64,7 +65,7 @@ describe('.use()', function() {
 	runTests(true);
 });
 
-describe('.useYauzl() with options.clone = false', function() {
+describe('.useYauzl() with options.clone = false', () => {
 	before(function() {
 		this.Promise = Promise;
 		this.yauzl = yauzl.useYauzl(yauzlOriginal, {clone: false});
@@ -77,7 +78,7 @@ function runTests(cloned) {
 	// Inject `yauzl` and `Promise` into local scope at tests run time.
 	// Doing at tests define time alters `yauzlOriginal` object in
 	// `clone: false` run before tests on default behavior run.
-	let yauzl, Promise;
+	let yauzl, Promise; // eslint-disable-line no-shadow
 	before(function() {
 		yauzl = this.yauzl;
 		Promise = this.Promise;
@@ -85,12 +86,12 @@ function runTests(cloned) {
 
 	// Test for cloning
 	if (cloned) {
-		describe('clones', function() {
-			it('yauzl object', function() {
+		describe('clones', () => {
+			it('yauzl object', () => {
 				expect(yauzl).to.not.equal(yauzlOriginal);
 			});
 
-			it('yauzl.ZipFile', function() {
+			it('yauzl.ZipFile', () => {
 				const {ZipFile} = yauzl;
 				expect(ZipFile).to.not.equal(yauzlOriginal.ZipFile);
 
@@ -100,7 +101,7 @@ function runTests(cloned) {
 				expect(zipFile).to.be.instanceof(EventEmitter);
 			});
 
-			it('yauzl.Entry', function() {
+			it('yauzl.Entry', () => {
 				const {Entry} = yauzl;
 				expect(Entry).to.not.equal(yauzlOriginal.Entry);
 
@@ -110,42 +111,40 @@ function runTests(cloned) {
 			});
 		});
 	} else {
-		it('does not clone yauzl', function() {
+		it('does not clone yauzl', () => {
 			expect(yauzl).to.equal(yauzlOriginal);
 		});
 	}
 
 	// Run tests on each access method
-	describe('Zip file accessed with .open()', function() {
-		describe(`.open()`, function() {
-			it('returns rejected promise if IO error', function() {
+	describe('Zip file accessed with .open()', () => {
+		describe('.open()', () => {
+			it('returns rejected promise if IO error', () => {
 				const promise = yauzl.open(BAD_PATH);
 				expect(promise).to.be.instanceof(Promise);
 				return expect(promise).to.be.rejected;
 			});
 		});
 
-		runMainTests('open', options => {
-			return yauzl.open(PATH, options);
-		});
+		runMainTests('open', options => yauzl.open(PATH, options));
 	});
 
-	describe('Zip file accessed with .fromFd()', function() {
-		runMainTests('fromFd', options => {
+	describe('Zip file accessed with .fromFd()', () => {
+		runMainTests('fromFd', (options) => {
 			const fd = fs.openSync(PATH, 'r');
 			return yauzl.fromFd(fd, options);
 		});
 	});
 
-	describe('Zip file accessed with .fromBuffer()', function() {
-		runMainTests('fromBuffer', options => {
+	describe('Zip file accessed with .fromBuffer()', () => {
+		runMainTests('fromBuffer', (options) => {
 			const buffer = fs.readFileSync(PATH);
 			return yauzl.fromBuffer(buffer, options);
 		});
 	});
 
-	describe('Zip file accessed with .fromRandomAccessReader()', function() {
-		runMainTests('fromRandomAccessReader', options => {
+	describe('Zip file accessed with .fromRandomAccessReader()', () => {
+		runMainTests('fromRandomAccessReader', (options) => {
 			const buffer = fs.readFileSync(PATH);
 			const reader = fdSlicer.createFromBuffer(buffer);
 			reader.unref = yauzl.RandomAccessReader.prototype.unref;
@@ -160,56 +159,46 @@ function runMainTests(methodName, method) {
 	// Inject `yauzl` and `Promise` into local scope at tests run time.
 	// Doing at tests define time alters `yauzlOriginal` object in
 	// `clone: false` run before tests on default behavior run.
-	let yauzl, Promise;
+	let yauzl, Promise; // eslint-disable-line no-shadow
 	before(function() {
 		yauzl = this.yauzl;
 		Promise = this.Promise;
 	});
 
-	describe(`.${methodName}()`, function() {
-		it('returns a Promise', function() {
+	describe(`.${methodName}()`, () => {
+		it('returns a Promise', () => {
 			const promise = method();
 			expect(promise).to.be.instanceof(Promise);
-			return promise.then(zipFile => {
-				return zipFile.close();
-			});
+			return promise.then(zipFile => zipFile.close());
 		});
 
-		it('resolves to instance of yauzl.ZipFile', function() {
-			return method().then(zipFile => {
-				expect(zipFile).to.be.instanceof(yauzl.ZipFile);
-				return zipFile.close();
-			});
-		});
+		it('resolves to instance of yauzl.ZipFile', () => method().then((zipFile) => {
+			expect(zipFile).to.be.instanceof(yauzl.ZipFile);
+			return zipFile.close();
+		}));
 
-		it('ignores `lazyEntries` option', function() {
-			return method({lazyEntries: false}).then(zipFile => {
-				expect(zipFile.lazyEntries).to.equal(true);
-				return zipFile.close();
-			});
-		});
+		it('ignores `lazyEntries` option', () => method({lazyEntries: false}).then((zipFile) => {
+			expect(zipFile.lazyEntries).to.equal(true);
+			return zipFile.close();
+		}));
 
-		it('ignores `autoClose` option', function() {
-			return method({autoClose: true}).then(zipFile => {
-				expect(zipFile.autoClose).to.equal(false);
-				return zipFile.close();
-			});
-		});
+		it('ignores `autoClose` option', () => method({autoClose: true}).then((zipFile) => {
+			expect(zipFile.autoClose).to.equal(false);
+			return zipFile.close();
+		}));
 	});
 
-	describe('.close()', function() {
-		it('returns a Promise', function() {
-			return method().then(zipFile => {
-				const promise = zipFile.close();
-				expect(promise).to.be.instanceof(Promise);
-				return promise;
-			});
-		});
+	describe('.close()', () => {
+		it('returns a Promise', () => method().then((zipFile) => {
+			const promise = zipFile.close();
+			expect(promise).to.be.instanceof(Promise);
+			return promise;
+		}));
 	});
 
-	describe('Entry methods', function() {
+	describe('Entry methods', () => {
 		beforeEach(function() {
-			return method().then(zipFile => {
+			return method().then((zipFile) => {
 				this.zipFile = zipFile;
 			});
 		});
@@ -218,10 +207,10 @@ function runMainTests(methodName, method) {
 			return this.zipFile.close();
 		});
 
-		describe('.readEntry()', function() {
+		describe('.readEntry()', () => {
 			beforeEach(function() {
 				this.promise = this.zipFile.readEntry();
-				return this.promise.then(entry => {
+				return this.promise.then((entry) => {
 					this.entry = entry;
 				});
 			});
@@ -239,29 +228,30 @@ function runMainTests(methodName, method) {
 			});
 
 			it('when called again, returns next entry', function() {
-				return this.zipFile.readEntry().then(entry => {
+				return this.zipFile.readEntry().then((entry) => {
 					expect(entry.fileName).to.equal(FILES[1]);
 				});
 			});
 
 			it('returns `null` when all entries consumed', function() {
 				expect(this.entry.fileName).to.equal(FILES[0]);
-				return this.zipFile.readEntry().then(entry => {
+				return this.zipFile.readEntry().then((entry) => {
 					expect(entry.fileName).to.equal(FILES[1]);
 					return this.zipFile.readEntry();
-				}).then(entry => {
+				}).then((entry) => {
 					expect(entry.fileName).to.equal(FILES[2]);
 					return this.zipFile.readEntry();
-				}).then(entry => {
+				}).then((entry) => {
 					expect(entry.fileName).to.equal(FILES[3]);
 					return this.zipFile.readEntry();
-				}).then(entry => {
-					expect(entry).to.be.null;
-				});
+				})
+					.then((entry) => {
+						expect(entry).to.be.null; // eslint-disable-line no-unused-expressions
+					});
 			});
 		});
 
-		describe('.readEntries()', function() {
+		describe('.readEntries()', () => {
 			it('returns a Promise', function() {
 				const promise = this.zipFile.readEntries();
 				expect(promise).to.be.instanceof(Promise);
@@ -269,7 +259,7 @@ function runMainTests(methodName, method) {
 			});
 
 			it('returns array of `numEntries` entries', function() {
-				return this.zipFile.readEntries(2).then(entries => {
+				return this.zipFile.readEntries(2).then((entries) => {
 					expect(entries).to.be.an('array');
 					expect(entries).to.have.lengthOf(2);
 					const fileNames = entries.map(entry => entry.fileName);
@@ -278,9 +268,7 @@ function runMainTests(methodName, method) {
 			});
 
 			it('when called again, returns next entries', function() {
-				return this.zipFile.readEntries(2).then(() => {
-					return this.zipFile.readEntries(2);
-				}).then(entries => {
+				return this.zipFile.readEntries(2).then(() => this.zipFile.readEntries(2)).then((entries) => {
 					expect(entries).to.be.an('array');
 					expect(entries).to.have.lengthOf(2);
 					const fileNames = entries.map(entry => entry.fileName);
@@ -289,7 +277,7 @@ function runMainTests(methodName, method) {
 			});
 
 			it('with no `numEntries` specified, returns all entries', function() {
-				return this.zipFile.readEntries().then(entries => {
+				return this.zipFile.readEntries().then((entries) => {
 					expect(entries).to.be.an('array');
 					expect(entries).to.have.lengthOf(FILES.length);
 					const fileNames = entries.map(entry => entry.fileName);
@@ -298,7 +286,7 @@ function runMainTests(methodName, method) {
 			});
 		});
 
-		describe('.walkEntries()', function() {
+		describe('.walkEntries()', () => {
 			it('returns a Promise', function() {
 				const promise = this.zipFile.walkEntries(() => {});
 				expect(promise).to.be.instanceof(Promise);
@@ -307,7 +295,7 @@ function runMainTests(methodName, method) {
 
 			it('calls callback for each entry', function() {
 				const entries = [];
-				return this.zipFile.walkEntries(entry => {
+				return this.zipFile.walkEntries((entry) => {
 					entries.push(entry);
 				}).then(() => {
 					const fileNames = entries.map(entry => entry.fileName);
@@ -322,7 +310,7 @@ function runMainTests(methodName, method) {
 					count++;
 					events.push(`callback${count}`);
 
-					return new Promise(resolve => {
+					return new Promise((resolve) => {
 						setTimeout(() => {
 							events.push(`resolve${count}`);
 							resolve();
@@ -343,20 +331,18 @@ function runMainTests(methodName, method) {
 
 			it('rejects promise if callback returns rejected promise', function() {
 				const err = new Error('test');
-				const p = this.zipFile.walkEntries(() => {
-					return new Promise((resolve, reject) => reject(err)); // jshint ignore:line
-				});
+				const p = this.zipFile.walkEntries(() => new Promise((resolve, reject) => reject(err)));
 				return expect(p).be.rejectedWith(err);
 			});
 		});
 	});
 
-	describe('Stream methods', function() {
+	describe('Stream methods', () => {
 		beforeEach(function() {
-			return method().then(zipFile => {
+			return method().then((zipFile) => {
 				this.zipFile = zipFile;
 				return zipFile.readEntry();
-			}).then(entry => {
+			}).then((entry) => {
 				this.entry = entry;
 			});
 		});
@@ -365,10 +351,10 @@ function runMainTests(methodName, method) {
 			return this.zipFile.close();
 		});
 
-		describe('zipFile.openReadStream()', function() {
+		describe('zipFile.openReadStream()', () => {
 			beforeEach(function() {
 				this.promise = this.zipFile.openReadStream(this.entry);
-				return this.promise.then(stream => {
+				return this.promise.then((stream) => {
 					this.stream = stream;
 				});
 			});
@@ -386,10 +372,10 @@ function runMainTests(methodName, method) {
 			});
 		});
 
-		describe('entry.openReadStream()', function() {
+		describe('entry.openReadStream()', () => {
 			beforeEach(function() {
 				this.promise = this.entry.openReadStream();
-				return this.promise.then(stream => {
+				return this.promise.then((stream) => {
 					this.stream = stream;
 				});
 			});
