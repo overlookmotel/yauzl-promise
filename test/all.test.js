@@ -3,15 +3,12 @@
  * Tests
  * ------------------*/
 
-/* eslint-disable no-invalid-this */
+/* eslint-disable jest/no-test-return-statement */
 
 'use strict';
 
 // Modules
-const chai = require('chai'),
-	{expect} = chai,
-	chaiAsPromised = require('chai-as-promised'),
-	pathJoin = require('path').join,
+const pathJoin = require('path').join,
 	fs = require('fs'),
 	fdSlicer = require('fd-slicer'),
 	ReadableStream = require('stream').Readable,
@@ -20,13 +17,7 @@ const chai = require('chai'),
 	yauzlOriginal = require('yauzl'),
 	yauzl = require('../index.js');
 
-// Init
-chai.config.includeStack = true;
-chai.use(chaiAsPromised);
-
 // Tests
-
-/* global describe, it, beforeEach, afterEach, before */
 
 const PATH = pathJoin(__dirname, 'test.zip'),
 	BAD_PATH = pathJoin(__dirname, 'does-not-exist.zip'),
@@ -34,85 +25,63 @@ const PATH = pathJoin(__dirname, 'test.zip'),
 
 // Run tests for yauzl object created with all methods
 describe('Default module', () => {
-	before(function() {
-		this.Promise = Promise;
-		this.yauzl = yauzl;
-	});
-	runTests(true);
+	runTests(() => yauzl, Promise, true);
 });
 
 describe('.usePromise()', () => {
-	before(function() {
-		this.Promise = Bluebird;
-		this.yauzl = yauzl.usePromise(Bluebird);
-	});
-	runTests(true);
+	runTests(() => yauzl.usePromise(Bluebird), Bluebird, true);
 });
 
 describe('.useYauzl()', () => {
-	before(function() {
-		this.Promise = Promise;
-		this.yauzl = yauzl.useYauzl(yauzlOriginal);
-	});
-	runTests(true);
+	runTests(() => yauzl.useYauzl(yauzlOriginal), Promise, true);
 });
 
 describe('.use()', () => {
-	before(function() {
-		this.Promise = Bluebird;
-		this.yauzl = yauzl.use(Bluebird, yauzlOriginal);
-	});
-	runTests(true);
+	runTests(() => yauzl.use(Bluebird, yauzlOriginal), Bluebird, true);
 });
 
 describe('.useYauzl() with options.clone = false', () => {
-	before(function() {
-		this.Promise = Promise;
-		this.yauzl = yauzl.useYauzl(yauzlOriginal, {clone: false});
-	});
-
-	runTests(false);
+	runTests(() => yauzl.useYauzl(yauzlOriginal, {clone: false}), Promise, false);
 });
 
-function runTests(cloned) {
-	// Inject `yauzl` and `Promise` into local scope at tests run time.
+function runTests(getYauzl, Promise, cloned) {
+	// Inject `yauzl` into local scope at tests run time.
 	// Doing at tests define time alters `yauzlOriginal` object in
 	// `clone: false` run before tests on default behavior run.
-	let yauzl, Promise; // eslint-disable-line no-shadow
-	before(function() {
-		yauzl = this.yauzl;
-		Promise = this.Promise;
+	let yauzl; // eslint-disable-line no-shadow
+	beforeAll(() => {
+		yauzl = getYauzl();
 	});
 
 	// Test for cloning
 	if (cloned) {
 		describe('clones', () => {
 			it('yauzl object', () => {
-				expect(yauzl).to.not.equal(yauzlOriginal);
+				expect(yauzl).not.toBe(yauzlOriginal);
 			});
 
 			it('yauzl.ZipFile', () => {
 				const {ZipFile} = yauzl;
-				expect(ZipFile).to.not.equal(yauzlOriginal.ZipFile);
+				expect(ZipFile).not.toBe(yauzlOriginal.ZipFile);
 
 				const zipFile = Object.create(ZipFile.prototype);
-				expect(zipFile).to.be.instanceof(ZipFile);
-				expect(zipFile).to.be.instanceof(yauzlOriginal.ZipFile);
-				expect(zipFile).to.be.instanceof(EventEmitter);
+				expect(zipFile).toBeInstanceOf(ZipFile);
+				expect(zipFile).toBeInstanceOf(yauzlOriginal.ZipFile);
+				expect(zipFile).toBeInstanceOf(EventEmitter);
 			});
 
 			it('yauzl.Entry', () => {
 				const {Entry} = yauzl;
-				expect(Entry).to.not.equal(yauzlOriginal.Entry);
+				expect(Entry).not.toBe(yauzlOriginal.Entry);
 
 				const entry = Object.create(Entry.prototype);
-				expect(entry).to.be.instanceof(Entry);
-				expect(entry).to.be.instanceof(yauzlOriginal.Entry);
+				expect(entry).toBeInstanceOf(Entry);
+				expect(entry).toBeInstanceOf(yauzlOriginal.Entry);
 			});
 		});
 	} else {
 		it('does not clone yauzl', () => {
-			expect(yauzl).to.equal(yauzlOriginal);
+			expect(yauzl).toBe(yauzlOriginal);
 		});
 	}
 
@@ -121,26 +90,26 @@ function runTests(cloned) {
 		describe('.open()', () => {
 			it('returns rejected promise if IO error', () => {
 				const promise = yauzl.open(BAD_PATH);
-				expect(promise).to.be.instanceof(Promise);
-				return expect(promise).to.be.rejected;
+				expect(promise).toBeInstanceOf(Promise);
+				return expect(promise).toReject();
 			});
 		});
 
-		runMainTests('open', options => yauzl.open(PATH, options));
+		runMainTests('open', options => yauzl.open(PATH, options), () => yauzl, Promise);
 	});
 
 	describe('Zip file accessed with .fromFd()', () => {
 		runMainTests('fromFd', (options) => {
 			const fd = fs.openSync(PATH, 'r');
 			return yauzl.fromFd(fd, options);
-		});
+		}, () => yauzl, Promise);
 	});
 
 	describe('Zip file accessed with .fromBuffer()', () => {
 		runMainTests('fromBuffer', (options) => {
 			const buffer = fs.readFileSync(PATH);
 			return yauzl.fromBuffer(buffer, options);
-		});
+		}, () => yauzl, Promise);
 	});
 
 	describe('Zip file accessed with .fromRandomAccessReader()', () => {
@@ -151,39 +120,39 @@ function runTests(cloned) {
 			reader.close = cb => cb();
 
 			return yauzl.fromRandomAccessReader(reader, buffer.length, options);
-		});
+		}, () => yauzl, Promise);
 	});
 }
 
-function runMainTests(methodName, method) {
-	// Inject `yauzl` and `Promise` into local scope at tests run time.
+function runMainTests(methodName, method, getYauzl, Promise) {
+	// Inject `yauzl` into local scope at tests run time.
 	// Doing at tests define time alters `yauzlOriginal` object in
 	// `clone: false` run before tests on default behavior run.
-	let yauzl, Promise; // eslint-disable-line no-shadow
-	before(function() {
-		yauzl = this.yauzl;
-		Promise = this.Promise;
+	let yauzl; // eslint-disable-line no-shadow
+	beforeAll(() => {
+		yauzl = getYauzl();
 	});
 
 	describe(`.${methodName}()`, () => {
 		it('returns a Promise', () => {
 			const promise = method();
-			expect(promise).to.be.instanceof(Promise);
+			expect(promise).toBeInstanceOf(Promise);
+
 			return promise.then(zipFile => zipFile.close());
 		});
 
 		it('resolves to instance of yauzl.ZipFile', () => method().then((zipFile) => {
-			expect(zipFile).to.be.instanceof(yauzl.ZipFile);
+			expect(zipFile).toBeInstanceOf(yauzl.ZipFile);
 			return zipFile.close();
 		}));
 
 		it('ignores `lazyEntries` option', () => method({lazyEntries: false}).then((zipFile) => {
-			expect(zipFile.lazyEntries).to.equal(true);
+			expect(zipFile.lazyEntries).toBeTrue();
 			return zipFile.close();
 		}));
 
 		it('ignores `autoClose` option', () => method({autoClose: true}).then((zipFile) => {
-			expect(zipFile.autoClose).to.equal(false);
+			expect(zipFile.autoClose).toBeFalse();
 			return zipFile.close();
 		}));
 	});
@@ -191,122 +160,120 @@ function runMainTests(methodName, method) {
 	describe('.close()', () => {
 		it('returns a Promise', () => method().then((zipFile) => {
 			const promise = zipFile.close();
-			expect(promise).to.be.instanceof(Promise);
+			expect(promise).toBeInstanceOf(Promise);
 			return promise;
 		}));
 	});
 
-	describe('Entry methods', () => {
-		beforeEach(function() {
-			return method().then((zipFile) => {
-				this.zipFile = zipFile;
-			});
-		});
+	describe('entry methods', () => {
+		let zipFile;
+		beforeEach(() => method().then((thisZipFile) => {
+			zipFile = thisZipFile;
+		}));
 
-		afterEach(function() {
-			return this.zipFile.close();
-		});
+		afterEach(() => zipFile.close());
 
 		describe('.readEntry()', () => {
-			beforeEach(function() {
-				this.promise = this.zipFile.readEntry();
-				return this.promise.then((entry) => {
-					this.entry = entry;
+			let promise, entry;
+			beforeEach(() => {
+				promise = zipFile.readEntry();
+				return promise.then((thisEntry) => {
+					entry = thisEntry;
 				});
 			});
 
-			it('returns a Promise', function() {
-				expect(this.promise).to.be.instanceof(Promise);
+			it('returns a Promise', () => {
+				expect(promise).toBeInstanceOf(Promise);
 			});
 
-			it('resolves to instance of yauzl.Entry', function() {
-				expect(this.entry).to.be.instanceof(yauzl.Entry);
+			it('resolves to instance of yauzl.Entry', () => {
+				expect(entry).toBeInstanceOf(yauzl.Entry);
 			});
 
-			it('returns first entry', function() {
-				expect(this.entry.fileName).to.equal(FILES[0]);
+			it('returns first entry', () => {
+				expect(entry.fileName).toBe(FILES[0]);
 			});
 
-			it('when called again, returns next entry', function() {
-				return this.zipFile.readEntry().then((entry) => {
-					expect(entry.fileName).to.equal(FILES[1]);
-				});
+			it('when called again, returns next entry', () => { // eslint-disable-line arrow-body-style
+				return zipFile.readEntry()
+					.then((nextEntry) => {
+						expect(nextEntry.fileName).toBe(FILES[1]);
+					});
 			});
 
-			it('returns `null` when all entries consumed', function() {
-				expect(this.entry.fileName).to.equal(FILES[0]);
-				return this.zipFile.readEntry().then((entry) => {
-					expect(entry.fileName).to.equal(FILES[1]);
-					return this.zipFile.readEntry();
-				}).then((entry) => {
-					expect(entry.fileName).to.equal(FILES[2]);
-					return this.zipFile.readEntry();
-				}).then((entry) => {
-					expect(entry.fileName).to.equal(FILES[3]);
-					return this.zipFile.readEntry();
-				})
-					.then((entry) => {
-						expect(entry).to.be.null; // eslint-disable-line no-unused-expressions
+			it('returns `null` when all entries consumed', () => {
+				expect(entry.fileName).toBe(FILES[0]);
+				return zipFile.readEntry()
+					.then((entry2) => {
+						expect(entry2.fileName).toBe(FILES[1]);
+						return zipFile.readEntry();
+					}).then((entry3) => {
+						expect(entry3.fileName).toBe(FILES[2]);
+						return zipFile.readEntry();
+					}).then((entry4) => {
+						expect(entry4.fileName).toBe(FILES[3]);
+						return zipFile.readEntry();
+					})
+					.then((entry5) => {
+						expect(entry5).toBeNull();
 					});
 			});
 		});
 
 		describe('.readEntries()', () => {
-			it('returns a Promise', function() {
-				const promise = this.zipFile.readEntries();
-				expect(promise).to.be.instanceof(Promise);
+			it('returns a Promise', () => {
+				const promise = zipFile.readEntries();
+				expect(promise).toBeInstanceOf(Promise);
 				return promise;
 			});
 
-			it('returns array of `numEntries` entries', function() {
-				return this.zipFile.readEntries(2).then((entries) => {
-					expect(entries).to.be.an('array');
-					expect(entries).to.have.lengthOf(2);
-					const fileNames = entries.map(entry => entry.fileName);
-					expect(fileNames).to.deep.equal(FILES.slice(0, 2));
-				});
+			it('returns array of `numEntries` entries', () => { // eslint-disable-line arrow-body-style
+				return zipFile.readEntries(2)
+					.then((entries) => {
+						expect(entries).toBeArrayOfSize(2);
+						expect(entries.map(entry => entry.fileName)).toEqual(FILES.slice(0, 2));
+					});
 			});
 
-			it('when called again, returns next entries', function() {
-				return this.zipFile.readEntries(2).then(() => this.zipFile.readEntries(2)).then((entries) => {
-					expect(entries).to.be.an('array');
-					expect(entries).to.have.lengthOf(2);
-					const fileNames = entries.map(entry => entry.fileName);
-					expect(fileNames).to.deep.equal(FILES.slice(2, 4));
-				});
+			it('when called again, returns next entries', () => { // eslint-disable-line arrow-body-style
+				return zipFile.readEntries(2)
+					.then(() => zipFile.readEntries(2))
+					.then((entries) => {
+						expect(entries).toBeArrayOfSize(2);
+						expect(entries.map(entry => entry.fileName)).toEqual(FILES.slice(2, 4));
+					});
 			});
 
-			it('with no `numEntries` specified, returns all entries', function() {
-				return this.zipFile.readEntries().then((entries) => {
-					expect(entries).to.be.an('array');
-					expect(entries).to.have.lengthOf(FILES.length);
-					const fileNames = entries.map(entry => entry.fileName);
-					expect(fileNames).to.deep.equal(FILES);
-				});
+			// eslint-disable-next-line arrow-body-style
+			it('with no `numEntries` specified, returns all entries', () => {
+				return zipFile.readEntries()
+					.then((entries) => {
+						expect(entries).toBeArrayOfSize(FILES.length);
+						expect(entries.map(entry => entry.fileName)).toEqual(FILES);
+					});
 			});
 		});
 
 		describe('.walkEntries()', () => {
-			it('returns a Promise', function() {
-				const promise = this.zipFile.walkEntries(() => {});
-				expect(promise).to.be.instanceof(Promise);
+			it('returns a Promise', () => {
+				const promise = zipFile.walkEntries(() => {});
+				expect(promise).toBeInstanceOf(Promise);
 				return promise;
 			});
 
-			it('calls callback for each entry', function() {
+			it('calls callback for each entry', () => {
 				const entries = [];
-				return this.zipFile.walkEntries((entry) => {
+				return zipFile.walkEntries((entry) => {
 					entries.push(entry);
 				}).then(() => {
-					const fileNames = entries.map(entry => entry.fileName);
-					expect(fileNames).to.deep.equal(FILES);
+					expect(entries.map(entry => entry.fileName)).toEqual(FILES);
 				});
 			});
 
-			it('awaits promise returned by callback before reading next entry', function() {
+			it('awaits promise returned by callback before reading next entry', () => {
 				const events = [];
 				let count = 0;
-				return this.zipFile.walkEntries(() => {
+				return zipFile.walkEntries(() => {
 					count++;
 					events.push(`callback${count}`);
 
@@ -317,79 +284,87 @@ function runMainTests(methodName, method) {
 						}, 100);
 					});
 				}).then(() => {
-					expect(events).to.deep.equal(['callback1', 'resolve1', 'callback2', 'resolve2', 'callback3', 'resolve3', 'callback4', 'resolve4']);
+					expect(events).toEqual([
+						'callback1', 'resolve1',
+						'callback2', 'resolve2',
+						'callback3', 'resolve3',
+						'callback4', 'resolve4'
+					]);
 				});
 			});
 
-			it('rejects promise if callback throws', function() {
+			it('rejects promise if callback throws', () => {
 				const err = new Error('test');
-				const p = this.zipFile.walkEntries(() => {
+				const p = zipFile.walkEntries(() => {
 					throw err;
 				});
-				return expect(p).be.rejectedWith(err);
+				return expect(p).rejects.toBe(err);
 			});
 
-			it('rejects promise if callback returns rejected promise', function() {
+			it('rejects promise if callback returns rejected promise', () => {
 				const err = new Error('test');
-				const p = this.zipFile.walkEntries(() => new Promise((resolve, reject) => reject(err)));
-				return expect(p).be.rejectedWith(err);
+				const p = zipFile.walkEntries(() => new Promise((resolve, reject) => reject(err)));
+				return expect(p).rejects.toBe(err);
 			});
 		});
 	});
 
-	describe('Stream methods', () => {
-		beforeEach(function() {
-			return method().then((zipFile) => {
-				this.zipFile = zipFile;
-				return zipFile.readEntry();
-			}).then((entry) => {
-				this.entry = entry;
-			});
+	describe('stream methods', () => {
+		let zipFile, entry;
+		beforeEach(() => { // eslint-disable-line arrow-body-style
+			return method()
+				.then((thisZipFile) => {
+					zipFile = thisZipFile;
+					return zipFile.readEntry();
+				})
+				.then((thisEntry) => {
+					entry = thisEntry;
+				});
 		});
 
-		afterEach(function() {
-			return this.zipFile.close();
-		});
+		afterEach(() => zipFile.close());
 
 		describe('zipFile.openReadStream()', () => {
-			beforeEach(function() {
-				this.promise = this.zipFile.openReadStream(this.entry);
-				return this.promise.then((stream) => {
-					this.stream = stream;
+			let promise, stream;
+			beforeEach(() => {
+				promise = zipFile.openReadStream(entry);
+				return promise.then((thisStream) => {
+					stream = thisStream;
 				});
 			});
 
-			afterEach(function() {
-				this.stream.on('error', () => {}).destroy();
+			afterEach(() => {
+				stream.on('error', () => {}).destroy();
 			});
 
-			it('returns a Promise', function() {
-				expect(this.promise).to.be.instanceof(Promise);
+			it('returns a Promise', () => {
+				expect(promise).toBeInstanceOf(Promise);
 			});
 
-			it('resolves to Readable Stream', function() {
-				expect(this.stream).to.be.instanceof(ReadableStream);
+			it('resolves to Readable Stream', () => {
+				expect(stream).toBeInstanceOf(ReadableStream);
 			});
 		});
 
 		describe('entry.openReadStream()', () => {
-			beforeEach(function() {
-				this.promise = this.entry.openReadStream();
-				return this.promise.then((stream) => {
-					this.stream = stream;
+			let promise, stream;
+			beforeEach(() => {
+				promise = entry.openReadStream();
+				return promise.then((thisStream) => {
+					stream = thisStream;
 				});
 			});
 
-			afterEach(function() {
-				this.stream.on('error', () => {}).destroy();
+			afterEach(() => {
+				stream.on('error', () => {}).destroy();
 			});
 
-			it('returns a Promise', function() {
-				expect(this.promise).to.be.instanceof(Promise);
+			it('returns a Promise', () => {
+				expect(promise).toBeInstanceOf(Promise);
 			});
 
-			it('resolves to Readable Stream', function() {
-				expect(this.stream).to.be.instanceof(ReadableStream);
+			it('resolves to Readable Stream', () => {
+				expect(stream).toBeInstanceOf(ReadableStream);
 			});
 		});
 	});
