@@ -26,7 +26,6 @@
     "bluebird": "^3.7.2",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.1.1",
     "cross-env": "^7.0.3",
     "eslint": "^8.39.0",
     "fd-slicer": "^1.1.0",
@@ -47,9 +46,7 @@
     "lint-fix": "eslint . --fix",
     "test-main": "mocha --check-leaks --colors -t 10000 -R spec \"test/**/*.test.js\"",
     "cover": "npm run cover-main && rm -rf coverage",
-    "coveralls": "npm run cover-main && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage",
-    "cover-main": "cross-env COVERAGE=true istanbul cover _mocha --report lcovonly -- -t 10000 -R spec \"test/**/*.test.js\"",
-    "travis": "if [ $COVERAGE ]; then npm run coveralls; else npm test; fi"
+    "cover-main": "cross-env COVERAGE=true istanbul cover _mocha --report lcovonly -- -t 10000 -R spec \"test/**/*.test.js\""
   },
   "engines": {
     "node": ">=16"
