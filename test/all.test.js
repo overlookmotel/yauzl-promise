@@ -307,6 +307,16 @@ function runMainTests(methodName, method, getYauzl, Promise) {
 				return expect(p).rejects.toBe(err);
 			});
 		});
+
+		describe('async iterator', () => {
+			it('iterates entries', async () => {
+				const filenames = [];
+				for await (const entry of zipFile) {
+					filenames.push(entry.fileName);
+				}
+				expect(filenames).toEqual(FILES);
+			});
+		});
 	});
 
 	describe('stream methods', () => {

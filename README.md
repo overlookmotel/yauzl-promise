@@ -14,6 +14,22 @@ Promisified version of [yauzl](https://www.npmjs.com/package/yauzl) for unzippin
 npm install yauzl-promise
 ```
 
+### Simple usage
+
+```js
+const {pipeline} = require('stream/promises');
+const zipFile = await yauzl.open('/path/to/file.zip');
+try {
+  for await (const entry of zipFile) {
+    if (entry.fileName.endsWith('/')) continue;
+    const readStream = await entry.openReadStream();
+    await pipeline(readStream, writeStream);
+  }
+} finally {
+  await zipfile.close();
+}
+```
+
 ### Methods
 
 #### `open()` / `fromFd()` / `fromBuffer()` / `fromRandomAccessReader()`
@@ -62,7 +78,7 @@ entries.forEach(console.log);
 
 If `numEntries` is `0`, `null` or `undefined`, reading will continue until all entries are read.
 
-WARNING: This is dangerous. If ZIP contains a large number of files, could lead to crash due to out of memory. Use `.walkEntries()` instead.
+WARNING: This is dangerous. If ZIP contains a large number of files, could lead to crash due to out of memory. Use `.walkEntries()` or async iteration instead.
 
 #### `zipFile.walkEntries( callback [, numEntries] )`
 
@@ -80,6 +96,19 @@ console.log('Done');
 ```
 
 If `numEntries` is `0`, `null` or `undefined`, reading will continue until all entries are read.
+
+#### Async iteration
+
+`ZipFile`s can be used as async iterators, iterating over entries.
+
+```js
+const zipFile = await yauzl.open('/path/to/file.zip');
+
+const entries = [];
+for await (const entry of zipFile) {
+  entries.push(entry);
+}
+```
 
 #### `zipFile.openReadStream( entry [, options] )`
 
