@@ -10,6 +10,7 @@
 // Modules
 const pathJoin = require('path').join,
 	fs = require('fs'),
+	{finished} = require('stream/promises'),
 	fdSlicer = require('fd-slicer'),
 	ReadableStream = require('stream').Readable,
 	EventEmitter = require('events'),
@@ -22,6 +23,12 @@ const pathJoin = require('path').join,
 const PATH = pathJoin(__dirname, 'fixtures/test.zip'),
 	BAD_PATH = pathJoin(__dirname, 'fixtures/does-not-exist.zip'),
 	FILES = ['test_files/', 'test_files/1.txt', 'test_files/2.txt', 'test_files/3.txt'];
+
+const FILE_CONTENTS = Object.create(null);
+for (const filename of FILES) {
+	if (filename.endsWith('/')) continue;
+	FILE_CONTENTS[filename] = fs.readFileSync(pathJoin(__dirname, 'fixtures', filename), 'utf8');
+}
 
 // Run tests for yauzl object created with all methods
 describe('Default module', () => {
@@ -355,6 +362,28 @@ function runMainTests(methodName, method, getYauzl, Promise) {
 			it('resolves to Readable Stream', () => {
 				expect(stream).toBeInstanceOf(ReadableStream);
 			});
+
+			it('streams file data', () => {
+				expect(entry.fileName).toBe(FILES[0]); // Directory which we can skip
+
+				let p = Promise.resolve();
+				for (const filename of FILES.slice(1)) {
+					// eslint-disable-next-line jest/valid-expect-in-promise, no-loop-func
+					p = p.then(() => zipFile.readEntry())
+						.then((entry) => { // eslint-disable-line no-loop-func, no-shadow
+							expect(entry.fileName).toBe(filename);
+							return zipFile.openReadStream(entry)
+								.then(async (stream) => { // eslint-disable-line no-shadow
+									const chunks = [];
+									stream.on('data', chunk => chunks.push(chunk));
+									await finished(stream, {writable: false});
+									const data = Buffer.concat(chunks).toString();
+									expect(data).toBe(FILE_CONTENTS[filename]);
+								});
+						});
+				}
+				return p;
+			});
 		});
 
 		describe('entry.openReadStream()', () => {
@@ -377,6 +406,28 @@ function runMainTests(methodName, method, getYauzl, Promise) {
 
 			it('resolves to Readable Stream', () => {
 				expect(stream).toBeInstanceOf(ReadableStream);
+			});
+
+			it('streams file data', () => {
+				expect(entry.fileName).toBe(FILES[0]); // Directory which we can skip
+
+				let p = Promise.resolve();
+				for (const filename of FILES.slice(1)) {
+					// eslint-disable-next-line jest/valid-expect-in-promise, no-loop-func
+					p = p.then(() => zipFile.readEntry())
+						.then((entry) => { // eslint-disable-line no-shadow
+							expect(entry.fileName).toBe(filename);
+							return entry.openReadStream()
+								.then(async (stream) => { // eslint-disable-line no-shadow
+									const chunks = [];
+									stream.on('data', chunk => chunks.push(chunk));
+									await finished(stream, {writable: false});
+									const data = Buffer.concat(chunks).toString();
+									expect(data).toBe(FILE_CONTENTS[filename]);
+								});
+						});
+				}
+				return p;
 			});
 		});
 	});
