@@ -6,9 +6,6 @@
 
 [![NPM version](https://img.shields.io/npm/v/yauzl-promise.svg)](https://www.npmjs.com/package/yauzl-promise)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/overlookmotel/yauzl-promise/test.yml?branch=master)](https://github.com/overlookmotel/yauzl-promise/actions)
-[![Dependency Status](https://img.shields.io/david/overlookmotel/yauzl-promise.svg)](https://david-dm.org/overlookmotel/yauzl-promise)
-[![Dev dependency Status](https://img.shields.io/david/dev/overlookmotel/yauzl-promise.svg)](https://david-dm.org/overlookmotel/yauzl-promise)
-[![Greenkeeper badge](https://badges.greenkeeper.io/overlookmotel/yauzl-promise.svg)](https://greenkeeper.io/)
 [![Coverage Status](https://img.shields.io/coveralls/overlookmotel/yauzl-promise/master.svg)](https://coveralls.io/r/overlookmotel/yauzl-promise)
 
 ## Usage
