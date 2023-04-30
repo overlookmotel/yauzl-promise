@@ -159,6 +159,24 @@ const yauzl = require('yauzl-promise').useYauzl(yauzlFork, { clone: false });
 assert(yauzl === yauzlFork);
 ```
 
+#### Using another version of `yauzl` and alternative Promise implementation
+
+`.use()` method does both of the above.
+
+```js
+const yauzlCrc = require('yauzl-crc');
+const Bluebird = require('bluebird');
+const yauzl = require('yauzl-promise').use(Bluebird, yauzlCrc);
+```
+
+The yauzl object passed is cloned before it is modified, unless you set `clone` option to `false`:
+
+```js
+const yauzlFork = require('my-yauzl-fork');
+const yauzl = require('yauzl-promise').use(Bluebird, yauzlFork, { clone: false });
+assert(yauzl === yauzlFork);
+```
+
 ## Versioning
 
 This module follows [semver](https://semver.org/). Breaking changes will only be made in major version updates.
