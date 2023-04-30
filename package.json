@@ -18,15 +18,15 @@
     "yauzl-clone": "^2.0.0"
   },
   "devDependencies": {
-    "bluebird": "^3.5.1",
-    "chai": "^4.1.2",
+    "bluebird": "^3.7.2",
+    "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.0.1",
-    "cross-env": "^5.1.6",
-    "fd-slicer": "^1.0.1",
+    "coveralls": "^3.1.1",
+    "cross-env": "^7.0.3",
+    "fd-slicer": "^1.1.0",
     "istanbul": "^0.4.5",
-    "jshint": "^2.9.5",
-    "mocha": "^5.2.0"
+    "jshint": "^2.13.6",
+    "mocha": "^10.2.0"
   },
   "keywords": [
     "yauzl",
