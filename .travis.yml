@@ -4,9 +4,10 @@ script:
   - "npm run travis"
 
 node_js:
-  - "6"
-  - "8"
-  - "10"
+  - "16"
+  - "18"
+  - "19"
+  - "20"
 
 branches:
   except:
@@ -15,7 +16,7 @@ branches:
 matrix:
   fast_finish: true
   include:
-    - node_js: "10"
+    - node_js: "18"
       env: COVERAGE=true
   allow_failures:
     - env: COVERAGE=true
