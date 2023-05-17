@@ -1,6 +1,6 @@
 {
   "name": "yauzl-promise",
-  "version": "2.1.3",
+  "version": "3.0.0",
   "description": "yauzl unzipping with Promises",
   "main": "index.js",
   "files": [

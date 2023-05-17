@@ -1,5 +1,53 @@
 # Changelog
 
+## 3.0.0
+
+Breaking changes:
+
+* Drop support for NodeJS < v16
+* Remove handling no native `Promise` constructor
+
+Features:
+
+* Async iteration
+
+Refactor:
+
+* Add entry point in package root
+
+Dependencies:
+
+* Update dependencies
+
+Tests:
+
+* Run tests with Jest
+* Test correct data from streams
+* Capture stream errors [fix]
+* Move test ZIP into `fixtures` dir
+
+Docs:
+
+* Improve simple use example
+* Document `use` method
+* Reformat docs + tweaks
+* Add section on versioning
+* Remove old badges from README
+* Reverse order of changelog
+* Update license year
+* Remove license indentation
+
+Dev:
+
+* Replace JSHint with ESLint
+* Use Github Actions for CI
+* Update dev dependencies
+* Add `package-lock.json`
+* Replace `.npmignore` with `files` key in `package.json`
+* Update editorconfig
+* `.gitattributes` file
+* Re-order `.gitignore`
+
 ## 2.1.3
 
 * Update `yauzl-clone` dependency
