@@ -42,9 +42,10 @@
     "test": "npm run lint && npm run test-main",
     "lint": "jest --config=jest-eslint.config.js",
     "lint-fix": "eslint . --fix",
-    "test-main": "jest",
+    "test-main": "jest --testPathIgnorePatterns=\"/node_modules/|mac-big.test.js\"",
+    "test-mac-big": "jest test/mac-big.test.js",
     "cover": "npm-run-all -c cover-main cover-cleanup",
-    "cover-main": "jest --coverage",
+    "cover-main": "jest --coverage --testPathIgnorePatterns=\"/node_modules/|mac-big.test.js\"",
     "cover-cleanup": "rm -rf coverage"
   },
   "engines": {

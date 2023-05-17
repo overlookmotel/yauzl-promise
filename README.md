@@ -10,6 +10,7 @@ This library is a rewrite of `yauzl`, which retains all its features and careful
 
 * Promise-based API
 * Validation of CRC32 checksums to ensure data integrity (using fast Rust CRC32 calculation)
+* Support for unzipping faulty ZIP files created by Mac OS Archive Utility (see [here](https://github.com/thejoshwolfe/yauzl/issues/69))
 * Extract files from ZIP in parallel
 * Additional options
 * Bug fixes
@@ -101,7 +102,8 @@ The `reader` parameter must be an instance of a subclass of [`yauzl.Reader`](#cl
   decodeStrings: true,
   validateEntrySizes: true,
   validateFilenames: true,
-  strictFilenames: false
+  strictFilenames: false,
+  supportMacArchive: true
 }
 ```
 
@@ -139,6 +141,14 @@ The spec forbids filenames with backslashes, but Microsoft's `System.IO.Compress
 `strictFilenames` is `false` by default so that clients can read these non-conformant ZIP files without knowing about this Microsoft-specific bug.
 
 When `strictFilenames`, `decodeStrings`, and `validateFilenames` options are all `true`, entries with backslashes in their filenames will result in an error.
+
+#### `supportMacArchive`
+
+When `true` (default), faulty ZIP files created by Mac OS Archive Utility can be unzipped successfully, despite being malformed.
+
+Mac OS Archive Utility creates such faulty ZIPs when either (1) ZIP's size is over 4 GiB, (2) any file in the ZIP is over 4 GiB compressed or uncompressed, or (3) number of files in the ZIP exceeds 65535. See [yauzl#69](https://github.com/thejoshwolfe/yauzl/issues/69) for more details.
+
+Handling these ZIPs does have a slight overhead. Also, in some *extremely* rare cases, it's possible it could also cause a valid ZIP to be mis-interpreted. So if you're sure ZIP is not created by Mac OS Archive Utility, you can disable the support for a very marginal performance improvement.
 
 ### `zip.close()`
 
@@ -262,6 +272,16 @@ Instances of `Zip` class are returned by `open()`, `fromFd()`, `fromBuffer()`, a
 
 `Number`. Total number of entries in ZIP file.
 
+#### `zip.entryCountIsCertain`
+
+`Boolean`. `true` if `entryCount` can be relied on for accuracy.
+
+Mac OS Archive Utility truncates `entryCount` to 16 bits (i.e. max 65535), so it can be inaccurate.
+
+Where the ZIP file has been identified as possibly a Mac OS ZIP, and it's possible `entryCount` is inaccurate, `entryCountIsCertain` will be `false`. In this case, actual number of entries may be higher than reported (but not lower).
+
+As entries are read with `readEntry()`, `entryCount` will be increased if it becomes evident that there are more entries than reported. Once `entryCount` is determined to definitely be accurate, `entryCountIsCertain` will change to `true`.
+
 #### `zip.comment`
 
 `String`. Always decoded with `CP437` per the spec.
@@ -271,6 +291,20 @@ If `options.decodeStrings` is `false`, this field is the undecoded `Buffer` inst
 #### `zip.isZip64`
 
 `true` if ZIP file uses ZIP64 extension (allowing more than 65535 files, or file data larger than 4 GiB).
+
+#### `zip.isMacArchive`
+
+`Boolean`. `true` if ZIP is a faulty Mac OS Archive Utility ZIP. `false` if it's not known to be.
+
+`zip.isMaybeMacArchive` indicates whether ZIP *may* be a Mac OS Archive Utility ZIP.
+
+You don't need to worry about either of these properties - they're mainly for the internal logic of this package - but if you happen to be interested, the possible states are:
+
+* `isMacArchive = true`: Definitely a faulty Mac OS Archive Utility ZIP.
+* `isMaybeMacArchive = true`: ZIP possibly created by Mac OS Archive Utility (very probably it is).
+* `isMaybeMacArchive = false`: ZIP definitely not created by versions Mac OS Archive Utility which produce faulty ZIPs.
+
+Both properties are updated by `readEntry()` and `openReadStream()`, as more about the ZIP file becomes known.
 
 ### Class: `Entry`
 
@@ -292,7 +326,7 @@ These fields are of type `Number`:
  * `internalFileAttributes`
  * `externalFileAttributes`
  * `fileHeaderOffset`
- * `fileDataOffset` (unpopulated until [`openReadStream()`](#reading-file-data) is called)
+ * `fileDataOffset` (usually unpopulated until [`openReadStream()`](#reading-file-data) is called)
 
 In addition:
 
@@ -306,6 +340,16 @@ This field is automatically validated unless `decodeStrings` or `validateFilenam
 If `decodeStrings` option is `false`, this field is the undecoded `Buffer` instead of a decoded `String`. In that case, `generalPurposeBitFlag` and any Info-ZIP Unicode Path Extra Field are ignored.
 
 NB: In original `yauzl`, this field was named `fileName` (capital `N`).
+
+#### `entry.uncompressedSizeIsCertain`
+
+`Boolean`. `true` if `uncompressedSize` is reliable.
+
+Mac OS Archive Utility truncates `uncompressedSize` to 32 bits (i.e. max size 4 GiB), so it is inaccurate for files >= 4 GiB in size.
+
+Where the ZIP file has been identified as possibly a Mac OS ZIP, and it's possible `uncompressedSize` is inaccurate, `uncompressedSizeIsCertain` will be `false`. In this case, actual `uncompressedSize` may be higher than reported (but not lower).
+
+After `openReadStream()` has completed streaming out the file, `uncompressedSize` will be updated to reflect the accurate uncompressed data size, and `uncompressedSizeIsCertain` will change to `true`. NB: This doesn't happen if either decompression (`decompress` option) or entry size validation (`validateEntrySizes` option) are disabled. Both are enabled by default.
 
 #### `entry.extraFields`
 
@@ -375,6 +419,8 @@ All active NodeJS release lines are supported (v16+ at time of writing). After a
 ## Tests
 
 Use `npm test` to run the tests. Use `npm run cover` to check coverage.
+
+Use `npm run test-mac-big` to run additional tests on large Mac OS ZIP files. These tests are slow.
 
 ## Changelog
 
