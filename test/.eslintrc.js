@@ -12,6 +12,6 @@ module.exports = {
 		'@overlookmotel/eslint-config-jest'
 	],
 	rules: {
-		'import/no-unresolved': ['error', {ignore: ['^yauzl-crc$'], commonjs: true}]
+		'import/no-unresolved': ['error', {ignore: ['^yauzl-promise$'], commonjs: true}]
 	}
 };

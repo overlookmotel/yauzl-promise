@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Prevent test fixtures being altered on Windows
+test/fixtures/** eol=lf
