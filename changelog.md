@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.0.0
+
+Breaking changes:
+
+* Reimplement yauzl from scratch (various API changes)
+
+Features:
+
+* Validation of CRC32 checksums
+* Support Mac OS Archive Utility ZIPs
+
 ## 3.0.0
 
 Breaking changes:
