@@ -254,7 +254,7 @@ const date = yauzl.dosDateTimeToDate(entry.lastModDate, entry.lastModTime);
 
 NB: Original `yauzl` interpreted dates according to local timezone. UTC is used here instead to ensure consistent result when unzipping the same ZIP anywhere.
 
-#### `validateFileName(filename)`
+#### `validateFilename(filename)`
 
 Checks filename is not absolute or relative path, and does not contain backslashes (`\`). Throws an error if it does.
 
