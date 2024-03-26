@@ -56,6 +56,39 @@ try {
 }
 ```
 
+### Identify symlinks
+
+Identify symlinks for a Yauzl entry:
+
+```js
+/**
+ * Get file mode from entry.
+ * 
+ * @param {yauzl.Entry} entry - Yauzl entry
+ * @return {number} - entry's file mode
+ */
+function modeFromEntry(entry) {
+  const attr = entry.externalFileAttributes >> 16 || 33188;
+
+  return [448 /* S_IRWXU */, 56 /* S_IRWXG */, 7 /* S_IRWXO */]
+    .map(mask => attr & mask)
+    .reduce((a, b) => a + b, attr & 61440 /* S_IFMT */);
+}
+
+/**
+ * Check if file mode is a symlink.
+ *
+ * @param {number} Yauzl' entry's file mode
+ * @return {boolean} - true if symlink, otherwise false
+ */
+function isSymlink(mode) {
+  return ((mode & 0o170000) === 0o120000)
+}
+
+const mode = modeFromEntry(entry);
+const symlinkExists = isSymlink(mode);
+```
+
 ### Open methods
 
 All methods return an instance of [`yauzl.Zip`](#class-zip) class.
