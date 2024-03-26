@@ -56,15 +56,11 @@ try {
 }
 ```
 
-### Handle symlinks
+### Identify symlinks
 
-Unzip all files from a ZIP file to a directory and handle symlink creation:
+Identify symlinks for a Yauzl entry:
 
 ```js
-const yauzl = require('yauzl-promise');
-const fs = require('node:fs');
-const fs = require('node:stream');
-
 /**
  * Get file mode from entry.
  * 
@@ -79,31 +75,18 @@ function modeFromEntry(entry) {
     .reduce((a, b) => a + b, attr & 61440 /* S_IFMT */);
 }
 
-const zip = await yauzl.open('/path/to/file.zip');
-let entry = await zip.readEntry();
-
-while (entry !== null) {
-  let entryPathAbs = path.join('/path/to/dest/dir', entry.filename);
-  /* Create the directory beforehand to prevent `ENOENT: no such file or directory` errors. */
-  await fs.promises.mkdir(path.dirname(entryPathAbs), { recursive: true });
-  /* Check if entry is a symbolic link */
-  const isSymlink = ((modeFromEntry(entry) & 0o170000) === 0o120000);
-  const readStream = await entry.openReadStream();
-  
-  if (isSymlink) {
-    const chunks = [];
-    readStream.on("data", (chunk) => chunks.push(chunk));
-    await stream.promises.finished(readStream);
-    const link = Buffer.concat(chunks).toString('utf8').trim();
-    await fs.promises.symlink(link, entryPathAbs)
-  } else {
-    const writeStream = fs.createWriteStream(entryPathAbs);
-    await stream.promises.pipeline(readStream, writeStream);
-  }
-
-  /* Read next entry */
-  entry = await zip.readEntry();
+/**
+ * Check if file mode is a symlink.
+ *
+ * @param {number} Yauzl' entry's file mode
+ * @return {boolean} - true if symlink, otherwise false
+ */
+function isSymlink(mode) {
+  return ((mode & 0o170000) === 0o120000)
 }
+
+const mode = modeFromEntry(entry);
+const symlinkExists = isSymlink(mode);
 ```
 
 ### Open methods
