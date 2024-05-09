@@ -241,7 +241,7 @@ readStream.pipe(writeStream);
 
 Specifying `decrypt: false` for an encrypted entry causes the readable stream to provide the raw, still-encrypted file data (including the 12-byte header described in the spec).
 
-#### `entry.isSymlink`
+#### `entry.isSymlink()`
 
 Check if an entry is a symlink. Returns a boolean.
 
