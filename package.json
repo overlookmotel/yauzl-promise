@@ -40,7 +40,6 @@
     "archive"
   ],
   "scripts": {
-    "jest": "jest",
     "test": "npm run lint && npm run test-main",
     "lint": "jest --config=jest-eslint.config.js",
     "lint-fix": "eslint . --fix",
