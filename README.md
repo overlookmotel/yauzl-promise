@@ -247,7 +247,9 @@ Check if an entry is a symlink. Returns a boolean.
 
 ```js
 const entry = await zip.readEntry();
-const isEntrySymlink = await entry.isSymlink();
+if (entry.isSymlink()) {
+  // logic to handle symlink extraction
+}
 ```
 
 ### Utilities
