@@ -13,7 +13,7 @@ const path = require('path'),
 	yauzl = require('yauzl-promise');
 
 describe('Identify symlinks', () => {
-	const zipPath = path.resolve('test', 'fixtures', 'symlink', 'node_generated.zip');
+	const zipPath = path.resolve('test', 'fixtures', 'symlink', 'Node generated text file with symlink.zip');
 
 	it('unzips, reads and checks if any entry is a symlink', async () => {
 		const zip = await yauzl.open(zipPath);
