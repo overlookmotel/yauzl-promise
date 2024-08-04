@@ -82,4 +82,27 @@ describe('Identify symlinks', () => {
 			{fileName: '7zip/file_symlink.lnk', isSymlink: true}
 		]);
 	});
+
+	it('reads symlink from WinRAR generated zip file', async () => {
+		const zipPath = path.resolve('test', 'fixtures', 'symlink', 'WinRAR_text_file_with_symlink.zip');
+		const zip = await yauzl.open(zipPath);
+		const zipMetadata = [];
+
+		try {
+			for await (const entry of zip) {
+				zipMetadata.push({
+					fileName: entry.filename,
+					isSymlink: entry.isSymlink()
+				});
+			}
+		} finally {
+			zip.close();
+		}
+
+		expect(zipMetadata).toEqual([
+			{fileName: 'winrar/', isSymlink: false},
+			{fileName: 'winrar/file.txt', isSymlink: false},
+			{fileName: 'winrar/file_symlink.lnk', isSymlink: true}
+		]);
+	});
 });
