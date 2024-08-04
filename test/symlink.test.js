@@ -59,4 +59,27 @@ describe('Identify symlinks', () => {
 			{fileName: 'winzip/file_symlink.lnk', isSymlink: true}
 		]);
 	});
+
+	it('reads symlink from 7-Zip generated zip file', async () => {
+		const zipPath = path.resolve('test', 'fixtures', 'symlink', '7-Zip_text_file_with_symlink.zip');
+		const zip = await yauzl.open(zipPath);
+		const zipMetadata = [];
+
+		try {
+			for await (const entry of zip) {
+				zipMetadata.push({
+					fileName: entry.filename,
+					isSymlink: entry.isSymlink()
+				});
+			}
+		} finally {
+			zip.close();
+		}
+
+		expect(zipMetadata).toEqual([
+			{fileName: '7zip/', isSymlink: false},
+			{fileName: '7zip/file.txt', isSymlink: false},
+			{fileName: '7zip/file_symlink.lnk', isSymlink: true}
+		]);
+	});
 });
