@@ -9,10 +9,10 @@
 require('./support/index.js');
 
 // Modules
-const pathJoin = require('path').join,
-	fs = require('fs'),
-	{promisify} = require('util'),
-	ReadableStream = require('stream').Readable,
+const pathJoin = require('node:path').join,
+	fs = require('node:fs'),
+	{promisify} = require('node:util'),
+	ReadableStream = require('node:stream').Readable,
 	yauzl = require('yauzl-promise');
 
 const openAsync = promisify(fs.open);

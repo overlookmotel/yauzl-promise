@@ -12,8 +12,8 @@
 require('./support/index.js');
 
 // Modules
-const pathJoin = require('path').join,
-	fs = require('fs'),
+const pathJoin = require('node:path').join,
+	fs = require('node:fs'),
 	yauzl = require('yauzl-promise');
 
 // Imports

@@ -6,8 +6,8 @@
 'use strict';
 
 // Modules
-const pathJoin = require('path').join,
-	fs = require('fs');
+const pathJoin = require('node:path').join,
+	fs = require('node:fs');
 
 // Imports
 const {streamToBuffer} = require('../../lib/utils.js');

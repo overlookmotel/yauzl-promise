@@ -11,7 +11,7 @@ require('./support/index.js');
 jest.setTimeout(5 * 60000); // 5 minutes
 
 // Modules
-const pathJoin = require('path').join,
+const pathJoin = require('node:path').join,
 	assert = require('simple-invariant'),
 	yauzl = require('yauzl-promise');
 
