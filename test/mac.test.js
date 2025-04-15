@@ -9,7 +9,7 @@
 require('./support/index.js');
 
 // Modules
-const pathJoin = require('path').join,
+const pathJoin = require('node:path').join,
 	yauzl = require('yauzl-promise');
 
 // Imports

@@ -9,7 +9,7 @@
 require('./support/index.js');
 
 // Modules
-const PassThroughStream = require('stream').PassThrough,
+const PassThroughStream = require('node:stream').PassThrough,
 	yauzl = require('yauzl-promise');
 
 // Imports

@@ -9,9 +9,9 @@
 require('./support/index.js');
 
 // Modules
-const {readFileSync} = require('fs'),
-	pathJoin = require('path').join,
-	{Readable: ReadableStream, Writable: WritableStream} = require('stream'),
+const {readFileSync} = require('node:fs'),
+	pathJoin = require('node:path').join,
+	{Readable: ReadableStream, Writable: WritableStream} = require('node:stream'),
 	BufferList = require('bl'),
 	assert = require('simple-invariant'),
 	yauzl = require('yauzl-promise');
