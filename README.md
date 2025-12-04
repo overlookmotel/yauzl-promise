@@ -9,7 +9,7 @@
 This library is a rewrite of `yauzl`, which retains all its features and careful adherence to the ZIP spec, but with the following improvements:
 
 * Promise-based API
-* Validation of CRC32 checksums to ensure data integrity (using fast Rust CRC32 calculation)
+* Validation of CRC32 checksums to ensure data integrity
 * Support for unzipping faulty ZIP files created by Mac OS Archive Utility (see [here](https://github.com/thejoshwolfe/yauzl/issues/69))
 * Extract files from ZIP in parallel
 * Additional options

@@ -17,7 +17,6 @@
     "url": "https://github.com/overlookmotel/yauzl-promise/issues"
   },
   "dependencies": {
-    "@node-rs/crc32": "^1.7.0",
     "is-it-type": "^5.1.2",
     "simple-invariant": "^2.0.1"
   },
@@ -49,7 +48,7 @@
     "cover-cleanup": "rm -rf coverage"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=20.15.0 <21 || >=22.2.0"
   },
   "readmeFilename": "README.md",
   "license": "MIT"

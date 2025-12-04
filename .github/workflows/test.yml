@@ -7,11 +7,11 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js 18
-      uses: actions/setup-node@v3
+    - uses: actions/checkout@v6
+    - name: Use Node.js 20
+      uses: actions/setup-node@v6
       with:
-        node-version: 18
+        node-version: 20
         cache: 'npm'
     - run: npm ci
     - run: npm run lint
@@ -21,12 +21,12 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20, 19, 18, 16]
+        node-version: [20, 22, 24]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
@@ -37,11 +37,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js 18
-      uses: actions/setup-node@v3
+    - uses: actions/checkout@v6
+    - name: Use Node.js 20
+      uses: actions/setup-node@v6
       with:
-        node-version: 18
+        node-version: 20
         cache: 'npm'
     - run: npm ci
     - run: npm run test-main
@@ -50,11 +50,11 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js 18
-      uses: actions/setup-node@v3
+    - uses: actions/checkout@v6
+    - name: Use Node.js 20
+      uses: actions/setup-node@v6
       with:
-        node-version: 18
+        node-version: 20
         cache: 'npm'
     - run: npm ci
     - run: npm run test-main
@@ -70,11 +70,11 @@ jobs:
       MAC_BIG_SIZE: ${{ matrix.mac-big-size }}
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js 18
-      uses: actions/setup-node@v3
+    - uses: actions/checkout@v6
+    - name: Use Node.js 20
+      uses: actions/setup-node@v6
       with:
-        node-version: 18
+        node-version: 20
         cache: 'npm'
     - run: npm ci
     - run: npm run test-mac-big
@@ -82,11 +82,11 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js 18
-      uses: actions/setup-node@v3
+    - uses: actions/checkout@v6
+    - name: Use Node.js 20
+      uses: actions/setup-node@v6
       with:
-        node-version: 18
+        node-version: 20
         cache: 'npm'
     - run: npm ci
     - run: npm run cover-main
