@@ -191,7 +191,6 @@ function defineTests(methodName, method) {
 
 			afterEach(async () => {
 				stream.destroy();
-				await new Promise((resolve) => { setTimeout(resolve, 0); });
 			});
 
 			it('returns a Promise', () => {
@@ -224,7 +223,6 @@ function defineTests(methodName, method) {
 
 			afterEach(async () => {
 				stream.destroy();
-				await new Promise((resolve) => { setTimeout(resolve, 0); });
 			});
 
 			it('returns a Promise', () => {
@@ -271,7 +269,6 @@ function defineTests(methodName, method) {
 
 			const stream1 = await entries[1].openReadStream();
 			stream1.destroy();
-			await new Promise((resolve) => { setTimeout(resolve, 100); });
 
 			const stream2 = await entries[1].openReadStream();
 			const content2 = await streamToString(stream2);
